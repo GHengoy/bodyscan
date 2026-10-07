@@ -52,7 +52,7 @@ export const POSTURE_COPY: Record<PostureItemId, ItemCopy> = {
   kneeAlign: {
     title: '다리 정렬',
     good: '나란히 선 젓가락 🥢 (무릎/발목 간격 {ratio})',
-    warn: '살짝 벌어진 젓가락 🥢 (무릎/발목 간격 {ratio})',
+    warn: '{variantLabel}이 살짝 보여요 (무릎/발목 간격 {ratio})',
     bad: '{variantLabel} (무릎/발목 간격 {ratio})',
     tip: 'O자 경향이면 허벅지 안쪽, X자 경향이면 엉덩이 바깥 근육 강화 운동이 도움이 돼요',
   },
@@ -88,8 +88,8 @@ export const POSTURE_COPY: Record<PostureItemId, ItemCopy> = {
 
 /** 변형(방향) 라벨 — kneeAlign/pelvicTilt/trunkLean의 {variantLabel} */
 export const VARIANT_LABEL: Record<string, string> = {
-  o: '카우보이 다리 🤠 (O자 경향)',
-  x: '펭귄 다리 🐧 (X자 경향)',
+  o: 'O자 경향 (카우보이 다리 🤠)',
+  x: 'X자 경향 (펭귄 다리 🐧)',
   neutral: '중립',
   anterior: '오리 엉덩이 🦆 전방경사 경향',
   posterior: '주저앉은 곰 🐻 후방경사 경향',

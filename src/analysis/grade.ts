@@ -58,7 +58,7 @@ function gradeKnee(r: number): { grade: Grade; severity: number; variant: string
 }
 
 function item(id: Exclude<PostureItemId, 'kneeAlign'>, value: number, variant: string): GradedItem {
-  // 뒤로 간 머리/뒤로 기운 상체는 "양호"로 취급(음수는 측정 항목의 문제가 아님)
+  // 머리/어깨가 뒤로 간 경우는 거북목·라운드숄더가 아니므로 0으로 클램프. 그 외 항목은 절댓값.
   const abs = id === 'forwardHead' || id === 'roundShoulder' ? Math.max(0, value) : Math.abs(value);
   const { grade, severity } = gradeByThreshold(abs, THRESHOLDS[id]);
   return { id, grade, value: abs, severity, variant };
