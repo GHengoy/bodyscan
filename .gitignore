@@ -1,0 +1,8 @@
+node_modules
+dist
+public/models
+public/wasm
+.env
+.env.local
+.superpowers/
+ㅁㄴㄴㅇ.txt
