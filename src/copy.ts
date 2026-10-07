@@ -1,0 +1,152 @@
+import type { PostureItemId, Headline } from './analysis/grade';
+
+export interface ItemCopy {
+  title: string;
+  good: string;
+  warn: string;
+  bad: string;
+  tip: string;
+}
+
+export function fillTemplate(s: string, vars: Record<string, string | number>): string {
+  return s.replace(/\{(\w+)\}/g, (_, k: string) => (k in vars ? String(vars[k]) : `{${k}}`));
+}
+
+export function sideLabel(variant: string): string {
+  if (variant === 'left') return '왼쪽';
+  if (variant === 'right') return '오른쪽';
+  return '';
+}
+
+export const POSTURE_COPY: Record<PostureItemId, ItemCopy> = {
+  shoulderTilt: {
+    title: '어깨 높이',
+    good: '자처럼 곧은 어깨선 📏 ({deg}°)',
+    warn: '살짝 기울어진 시소 ⚖️ — {side} 어깨가 {deg}° 높아요',
+    bad: '한쪽만 짐 든 택배기사 📦 — {side} 어깨가 {deg}° 높아요',
+    tip: '가방을 한쪽으로만 메지 말고, 낮은 쪽 어깨를 귀 쪽으로 으쓱 올려 5초 버티기 × 10회',
+  },
+  hipTilt: {
+    title: '골반 높이',
+    good: '수평계처럼 평평한 골반 🧰 ({deg}°)',
+    warn: '살짝 기울어진 골반 ⚖️ — {side}이 {deg}° 높아요',
+    bad: '한 발로 서는 플라밍고 골반 🦩 — {side}이 {deg}° 높아요',
+    tip: '짝다리 금지! 벽에 등을 대고 양발에 체중을 똑같이 나눠 서는 연습을 해 보세요',
+  },
+  headTilt: {
+    title: '머리 기울기',
+    good: '똑바로 세운 촛불 🕯️ ({deg}°)',
+    warn: '갸웃하는 강아지 🐶 — {side}으로 {deg}° 기울었어요',
+    bad: '궁금한 게 많은 강아지 🐶 — {side}으로 {deg}° 기울었어요',
+    tip: '화면을 볼 때 머리를 갸웃하는 습관이 있는지 확인하고, 목을 반대쪽으로 천천히 늘려 주세요',
+  },
+  centerDeviation: {
+    title: '몸 중심선',
+    good: '일직선으로 선 기둥 🏛️ (편차 {pct}%)',
+    warn: '살짝 흔들리는 갈대 🌾 (편차 {pct}%)',
+    bad: '바람 맞은 갈대 🌾 (편차 {pct}%)',
+    tip: '거울 앞에서 코–배꼽–양발 사이가 한 줄이 되는지 확인하며 서 보세요',
+  },
+  kneeAlign: {
+    title: '다리 정렬',
+    good: '나란히 선 젓가락 🥢 (무릎/발목 간격 {ratio})',
+    warn: '살짝 벌어진 젓가락 🥢 (무릎/발목 간격 {ratio})',
+    bad: '{variantLabel} (무릎/발목 간격 {ratio})',
+    tip: 'O자 경향이면 허벅지 안쪽, X자 경향이면 엉덩이 바깥 근육 강화 운동이 도움이 돼요',
+  },
+  forwardHead: {
+    title: '거북목',
+    good: '목이 곧은 기린 🦒 ({deg}°)',
+    warn: '목을 살짝 내민 거북이 🐢 ({deg}°)',
+    bad: '완전히 목을 내민 거북이 🐢 ({deg}°)',
+    tip: '턱을 뒤로 당겨 뒷목을 길게 만드는 "턱 당기기" 10회 × 3세트, 모니터는 눈높이로',
+  },
+  roundShoulder: {
+    title: '라운드숄더',
+    good: '쫙 펴진 어깨, 슈퍼히어로 🦸 ({pct}%)',
+    warn: '살짝 말린 어깨, 졸린 고양이 🐱 ({pct}%)',
+    bad: '등이 둥근 고양이 🐱 ({pct}%)',
+    tip: '문틀에 양팔을 대고 가슴을 앞으로 30초 스트레칭, 하루 3회',
+  },
+  pelvicTilt: {
+    title: '골반 경사',
+    good: '중립 골반, 균형 잡힌 저울 ⚖️ ({deg}°)',
+    warn: '{variantLabel}이 살짝 보여요 ({deg}°)',
+    bad: '{variantLabel} ({deg}°)',
+    tip: '전방경사는 복근·엉덩이 근육, 후방경사는 허리 신전 스트레칭이 도움이 돼요',
+  },
+  trunkLean: {
+    title: '상체 기울기',
+    good: '수직으로 선 등대 🗼 ({deg}°)',
+    warn: '{variantLabel} 살짝 기울었어요 ({deg}°)',
+    bad: '{variantLabel} {deg}° 기울었어요',
+    tip: '발뒤꿈치·엉덩이·어깨·뒤통수가 벽에 닿게 1분 서기 연습',
+  },
+};
+
+/** 변형(방향) 라벨 — kneeAlign/pelvicTilt/trunkLean의 {variantLabel} */
+export const VARIANT_LABEL: Record<string, string> = {
+  o: '카우보이 다리 🤠 (O자 경향)',
+  x: '펭귄 다리 🐧 (X자 경향)',
+  neutral: '중립',
+  anterior: '오리 엉덩이 🦆 전방경사 경향',
+  posterior: '주저앉은 곰 🐻 후방경사 경향',
+  forward: '앞으로',
+  backward: '뒤로',
+};
+
+export const HEADLINES: Record<string, { title: string; sub: string }> = {
+  perfect: { title: '운동선수처럼 완벽합니다 🏅', sub: '모든 항목이 양호 범위예요. 지금 자세를 유지하세요!' },
+  shoulderTilt: { title: '피사의 사탑이시군요 🗼', sub: '어깨가 한쪽으로 기울어 있어요.' },
+  hipTilt: { title: '피사의 사탑이시군요 🗼', sub: '골반이 한쪽으로 기울어 있어요.' },
+  headTilt: { title: '피사의 사탑이시군요 🗼', sub: '머리가 한쪽으로 기울어 있어요.' },
+  centerDeviation: { title: '바람 맞은 갈대시군요 🌾', sub: '몸의 중심선이 한쪽으로 흔들려 있어요.' },
+  kneeAlign: { title: '다리 정렬을 확인해 보세요 🦵', sub: '무릎 간격이 발목 간격과 많이 달라요.' },
+  'kneeAlign.o': { title: '카우보이 다리시군요 🤠', sub: '무릎이 바깥으로 벌어진 O자 경향이에요.' },
+  'kneeAlign.x': { title: '펭귄 다리시군요 🐧', sub: '무릎이 안쪽으로 모이는 X자 경향이에요.' },
+  forwardHead: { title: '당신은 거북이시군요 🐢', sub: '머리가 어깨보다 앞으로 나와 있어요.' },
+  roundShoulder: { title: '고양이처럼 등이 둥글어요 🐱', sub: '어깨가 앞으로 말려 있어요.' },
+  pelvicTilt: { title: '골반이 기울어 있어요 🦆', sub: '골반 경사 경향이 보여요.' },
+  'pelvicTilt.anterior': { title: '오리 엉덩이시군요 🦆', sub: '골반이 앞으로 기울어 허리가 과하게 휘어요.' },
+  'pelvicTilt.posterior': { title: '주저앉은 곰이시군요 🐻', sub: '골반이 뒤로 기울어 엉덩이가 처져 보여요.' },
+  trunkLean: { title: '상체가 기울어 있어요 ⛷️', sub: '상체가 수직에서 벗어나 있어요.' },
+  'trunkLean.forward': { title: '앞으로 쏠린 스키점프 선수 ⛷️', sub: '상체가 앞으로 기울어 있어요.' },
+  'trunkLean.backward': { title: '뒤로 기댄 리클라이너 🛋️', sub: '상체가 뒤로 기울어 있어요.' },
+};
+
+export function headlineCopy(h: Headline): { title: string; sub: string } {
+  return HEADLINES[`${h.id}.${h.variant}`] ?? HEADLINES[h.id];
+}
+
+export const UI_TEXT = {
+  appName: 'BodyScan',
+  tagline: '카메라만 켜면 끝. 저장도, 전송도 없는 체형분석',
+  privacyClaim: '영상은 저장되지 않고 이 기기 밖으로 나가지 않습니다 · 서버 없음',
+  startButton: '측정 시작',
+  guide: ['폰을 허리~가슴 높이에 세워 두세요', '2~2.5m 뒤로 물러나 전신이 보이게', '밝은 곳, 몸에 붙는 옷이 정확해요'],
+  loadingModel: '분석 엔진 준비 중…',
+  privacyOk: '📵 네트워크 전송 0건 · 영상은 이 기기 밖으로 나가지 않습니다',
+  privacyBad: (n: number) => `⚠️ 네트워크 요청 ${n}건 감지`,
+  setupHint: '전신이 보이도록 뒤로 물러나 주세요',
+  setupOk: '좋아요, 그대로 서 계세요',
+  setupTimeout: '더 뒤로 물러나거나 밝은 곳에서 시도해 주세요',
+  frontHint: '정면을 바라봐 주세요',
+  frontMeasuring: '정면 측정 중… 움직이지 마세요',
+  sideHint: '왼쪽으로 90° 돌아서 옆모습을 보여주세요',
+  sideMeasuring: '측면 측정 중… 움직이지 마세요',
+  cameraOff: '카메라가 꺼졌습니다. 영상은 어디에도 남지 않았습니다.',
+  share: '공유하기',
+  shareUnsupported: '이 브라우저는 공유를 지원하지 않습니다',
+  retry: '다시 측정',
+  disclaimer: '재미와 참고용 결과이며 의료적 진단이 아닙니다. 단일 카메라 2D 추정이라 오차가 있을 수 있어요.',
+  cameraDenied: '카메라 권한이 필요해요',
+  cameraDeniedBody: '브라우저 설정에서 이 사이트의 카메라 권한을 허용한 뒤 다시 시도해 주세요.',
+  modelFailed: '분석 엔진을 불러오지 못했어요',
+  modelFailedBody: '최초 1회는 인터넷 연결이 필요합니다. 연결을 확인하고 다시 시도해 주세요.',
+  desktopTitle: '모바일에서 열어주세요 📱',
+  desktopBody: '전면 카메라로 전신을 찍어야 해서 폰에서 가장 잘 동작해요. QR을 스캔하세요.',
+  skeletonOnly: '스켈레톤만 보기',
+  voice: '음성 안내',
+  adPlaceholder: '광고 자리',
+  productPlaceholder: '어울리는 옷 추천 자리',
+} as const;
