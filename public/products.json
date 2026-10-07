@@ -1,0 +1,6 @@
+[
+  { "image": "", "name": "V넥 베이직 티셔츠 (예시)", "price": "₩19,900", "url": "https://example.com/vneck", "bodyType": "inverted-balanced", "category": "top" },
+  { "image": "", "name": "하이웨이스트 와이드 팬츠 (예시)", "price": "₩39,900", "url": "https://example.com/wide", "bodyType": "any", "category": "bottom" },
+  { "image": "", "name": "베이직 테일러드 재킷 (예시)", "price": "₩89,000", "url": "https://example.com/jacket", "bodyType": "any", "category": "outer" },
+  { "image": "", "name": "보트넥 스트라이프 티 (예시)", "price": "₩24,900", "url": "https://example.com/boatneck", "bodyType": "triangle-balanced", "category": "top" }
+]
