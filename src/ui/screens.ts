@@ -55,7 +55,7 @@ export function desktopScreen(): string {
       <h2>${UI_TEXT.desktopTitle}</h2>
       <p>${UI_TEXT.desktopBody}</p>
       <canvas id="qr" width="220" height="220"></canvas>
-      <p class="fineprint">${location.href}</p>
+      <p class="fineprint" id="desktop-url"></p>
     </section>
   </main>`;
 }
