@@ -29,8 +29,13 @@ let products: Product[] = [];
 let capturing = false;
 let resumeOnVisible = false;
 let rafId = 0;
+let runId = 0;
 let activeVideo: HTMLVideoElement | null = null;
 let privacy: PrivacyIndicator | null = null;
+
+const setText = (el: HTMLElement, t: string) => {
+  if (el.textContent !== t) el.textContent = t;
+};
 
 const SETUP_TIMEOUT_MS = 30_000;
 
@@ -44,7 +49,10 @@ function isMobile(): boolean {
 function showStart(): void {
   app.innerHTML = startScreen();
   mountBanner($('[data-slot="start"]'), AD_SLOTS.start);
-  $('#start-btn').onclick = () => void runCapture();
+  $('#start-btn').onclick = (e) => {
+    (e.currentTarget as HTMLButtonElement).disabled = true;
+    void runCapture();
+  };
   if (products.length === 0) void loadProducts().then((p) => (products = p));
 }
 
@@ -62,6 +70,7 @@ function showError(title: string, body: string, onRetry: () => void): void {
 // ---------- 측정 ----------
 
 function stopCapture(): void {
+  runId++;
   capturing = false;
   cancelAnimationFrame(rafId);
   privacy?.stop();
@@ -71,9 +80,11 @@ function stopCapture(): void {
 }
 
 async function runCapture(): Promise<void> {
+  const myRun = ++runId;
   unmountBanners();
   app.innerHTML = cameraScreen();
   const video = $<HTMLVideoElement>('#video');
+  activeVideo = video;
   const canvas = $<HTMLCanvasElement>('#overlay');
   const statusEl = $('#status');
   const countdownEl = $('#countdown');
@@ -89,24 +100,37 @@ async function runCapture(): Promise<void> {
     await openCamera(video);
   } catch (e) {
     const denied = e instanceof CameraError && e.code === 'denied';
+    if (myRun !== runId) return;
     showError(
-      denied ? UI_TEXT.cameraDenied : UI_TEXT.modelFailed,
-      denied ? UI_TEXT.cameraDeniedBody : '카메라를 사용할 수 없어요. 다른 앱이 카메라를 쓰고 있지 않은지 확인해 주세요.',
+      denied ? UI_TEXT.cameraDenied : UI_TEXT.cameraUnavailable,
+      denied ? UI_TEXT.cameraDeniedBody : UI_TEXT.cameraUnavailableBody,
       () => void runCapture(),
     );
     return;
   }
-  activeVideo = video;
+  if (myRun !== runId) {
+    closeCamera(video);
+    return;
+  }
 
   if (!detector) {
     statusEl.textContent = UI_TEXT.loadingModel;
     try {
       detector = await createDetector();
     } catch {
+      if (myRun !== runId) {
+        closeCamera(video);
+        return;
+      }
       stopCapture();
       showError(UI_TEXT.modelFailed, UI_TEXT.modelFailedBody, () => void runCapture());
       return;
     }
+  }
+
+  if (myRun !== runId) {
+    closeCamera(video);
+    return;
   }
 
   // 모델 로딩이 끝난 뒤부터 네트워크 요청을 센다
@@ -130,73 +154,79 @@ async function runCapture(): Promise<void> {
   };
   say(UI_TEXT.setupHint);
 
+  const ctx = canvas.getContext('2d')!;
   const loop = () => {
     if (!capturing) return;
-    const now = performance.now();
-    const w = video.videoWidth, h = video.videoHeight;
-    if (w && h && (canvas.width !== w || canvas.height !== h)) {
-      canvas.width = w;
-      canvas.height = h;
-    }
-    const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, w, h);
-    const pose = detector!.detect(video, now);
-
-    if (phase === 'setup') {
-      const ok = !!pose && fullBodyVisible(pose);
-      drawGuide(ctx, w, h, ok);
-      if (pose) drawSkeleton(ctx, pose, w, h, { color: ok ? '#4ade80' : '#f8fafc' });
-      const held = setupHold.update(ok, now);
-      drawProgressRing(ctx, w, h, setupHold.progress(now));
-      statusEl.textContent = ok
-        ? UI_TEXT.setupOk
-        : now - startedAt > SETUP_TIMEOUT_MS ? UI_TEXT.setupTimeout : UI_TEXT.setupHint;
-      if (held) {
-        phase = 'front';
-        say(UI_TEXT.frontHint);
+    try {
+      const now = performance.now();
+      const w = video.videoWidth, h = video.videoHeight;
+      if (w && h && (canvas.width !== w || canvas.height !== h)) {
+        canvas.width = w;
+        canvas.height = h;
       }
-    } else {
-      const stage = phase === 'front' ? frontStage : sideStage;
-      const hint = phase === 'front' ? UI_TEXT.frontHint : UI_TEXT.sideHint;
-      const measuring = phase === 'front' ? UI_TEXT.frontMeasuring : UI_TEXT.sideMeasuring;
-      const st = stage.update(pose, now);
-      if (pose) drawSkeleton(ctx, pose, w, h, { color: st.ok ? '#4ade80' : '#fbbf24' });
-      countdownEl.textContent = st.step === 'countdown' ? String(st.countdown) : '';
+      ctx.clearRect(0, 0, w, h);
+      const pose = detector!.detect(video, now);
 
-      if (st.step === 'align') {
-        statusEl.textContent = st.ok ? UI_TEXT.setupOk : hint;
-        drawProgressRing(ctx, w, h, st.holdProgress);
-        lastCountdown = 0;
-      } else if (st.step === 'countdown') {
-        statusEl.textContent = UI_TEXT.setupOk;
-        if (st.countdown !== lastCountdown) {
-          lastCountdown = st.countdown;
-          speak(String(st.countdown));
+      if (phase === 'setup') {
+        const ok = !!pose && fullBodyVisible(pose);
+        drawGuide(ctx, w, h, ok);
+        if (pose) drawSkeleton(ctx, pose, w, h, { color: ok ? '#4ade80' : '#f8fafc' });
+        const held = setupHold.update(ok, now);
+        drawProgressRing(ctx, w, h, setupHold.progress(now));
+        setText(statusEl, ok
+          ? UI_TEXT.setupOk
+          : now - startedAt > SETUP_TIMEOUT_MS ? UI_TEXT.setupTimeout : UI_TEXT.setupHint);
+        if (held) {
+          phase = 'front';
+          say(UI_TEXT.frontHint);
         }
       } else {
-        statusEl.textContent = measuring;
-        drawProgressRing(ctx, w, h, st.sampleProgress);
-      }
+        const stage = phase === 'front' ? frontStage : sideStage;
+        const hint = phase === 'front' ? UI_TEXT.frontHint : UI_TEXT.sideHint;
+        const measuring = phase === 'front' ? UI_TEXT.frontMeasuring : UI_TEXT.sideMeasuring;
+        const st = stage.update(pose, now);
+        if (pose) drawSkeleton(ctx, pose, w, h, { color: st.ok ? '#4ade80' : '#fbbf24' });
+        setText(countdownEl, st.step === 'countdown' ? String(st.countdown) : '');
 
-      if (st.done) {
-        if (phase === 'front') {
-          frontPose = st.done;
-          phase = 'side';
-          say(UI_TEXT.sideHint);
+        if (st.step === 'align') {
+          setText(statusEl, st.ok ? UI_TEXT.setupOk : hint);
+          drawProgressRing(ctx, w, h, st.holdProgress);
+          lastCountdown = 0;
+        } else if (st.step === 'countdown') {
+          setText(statusEl, UI_TEXT.setupOk);
+          if (st.countdown !== lastCountdown) {
+            lastCountdown = st.countdown;
+            speak(String(st.countdown));
+          }
         } else {
-          finish(frontPose!, st.done, aspect());
-          return;
+          setText(statusEl, measuring);
+          drawProgressRing(ctx, w, h, st.sampleProgress);
+        }
+
+        if (st.done) {
+          if (phase === 'front') {
+            frontPose = st.done;
+            phase = 'side';
+            say(UI_TEXT.sideHint);
+          } else {
+            finish(frontPose!, st.done, aspect());
+            return;
+          }
         }
       }
+      rafId = requestAnimationFrame(loop);
+    } catch (err) {
+      console.error('[loop]', err);
+      stopCapture();
+      showError(UI_TEXT.detectFailed, UI_TEXT.detectFailedBody, () => void runCapture());
     }
-    rafId = requestAnimationFrame(loop);
   };
   rafId = requestAnimationFrame(loop);
 }
 
 function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
   stopCapture();
-  speak('측정이 끝났어요');
+  speak(UI_TEXT.measureDone);
   const front = analyzeFront(frontPose, aspect);
   const side = analyzeSide(sidePose, aspect);
   const proportion = analyzeProportion(frontPose, aspect);
@@ -215,7 +245,7 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    if (capturing) {
+    if (capturing || activeVideo) {
       stopCapture();
       resumeOnVisible = true;
     }
