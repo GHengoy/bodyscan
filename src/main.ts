@@ -101,6 +101,7 @@ async function runCapture(): Promise<void> {
   } catch (e) {
     const denied = e instanceof CameraError && e.code === 'denied';
     if (myRun !== runId) return;
+    activeVideo = null; // 에러 화면에서는 탭 복귀 시 카메라가 자동으로 켜지지 않도록
     showError(
       denied ? UI_TEXT.cameraDenied : UI_TEXT.cameraUnavailable,
       denied ? UI_TEXT.cameraDeniedBody : UI_TEXT.cameraUnavailableBody,
