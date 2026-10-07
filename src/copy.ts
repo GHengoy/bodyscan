@@ -1,4 +1,6 @@
 import type { PostureItemId, Headline } from './analysis/grade';
+import type { ShoulderHipType, TorsoLegType } from './analysis/proportion';
+import type { BodyTypeKey } from './analysis/style';
 
 export interface ItemCopy {
   title: string;
@@ -150,3 +152,80 @@ export const UI_TEXT = {
   adPlaceholder: '광고 자리',
   productPlaceholder: '어울리는 옷 추천 자리',
 } as const;
+
+export interface StyleAdvice {
+  top: string;
+  bottom: string;
+  outer: string;
+  avoid: string;
+}
+
+export const SHAPE_COPY = {
+  shoulderHip: {
+    inverted: { label: '역삼각형', emoji: '🏊', desc: '어깨가 골반보다 넓은 수영선수 체형' },
+    balanced: { label: '균형형', emoji: '🏛️', desc: '어깨와 골반이 비슷한 안정감 있는 기둥형' },
+    triangle: { label: '삼각형', emoji: '🍐', desc: '골반이 어깨보다 넓어 하체가 안정적인 체형' },
+  } satisfies Record<ShoulderHipType, { label: string; emoji: string; desc: string }>,
+  torsoLeg: {
+    longTorso: { label: '상체형', emoji: '🦍', desc: '상체가 긴 편, 허리선을 올려주면 좋아요' },
+    balanced: { label: '균형형', emoji: '🧍', desc: '상·하체 비율이 균형 잡혔어요' },
+    longLegs: { label: '롱다리형', emoji: '🦩', desc: '다리가 긴 플라밍고 비율' },
+  } satisfies Record<TorsoLegType, { label: string; emoji: string; desc: string }>,
+};
+
+export const STYLE_COPY: Record<BodyTypeKey, StyleAdvice> = {
+  'inverted-longTorso': {
+    top: 'V넥·딥 라운드넥으로 시선을 아래로. 어깨 디테일 없는 심플한 상의',
+    bottom: '하이웨이스트 와이드 팬츠로 허리선을 올리고 하체에 볼륨을',
+    outer: '허리 벨트 코트, 롱 가디건으로 세로 라인 강조',
+    avoid: '숄더패드, 보트넥, 로우라이즈 팬츠',
+  },
+  'inverted-balanced': {
+    top: 'V넥·헨리넥 티셔츠, 어깨를 가르는 세로 스트라이프',
+    bottom: '와이드·스트레이트 팬츠, 밝은색·패턴 하의로 균형',
+    outer: '엉덩이를 덮는 길이의 재킷, 라펠이 좁은 블레이저',
+    avoid: '퍼프 소매, 보트넥, 스키니 팬츠',
+  },
+  'inverted-longLegs': {
+    top: '롱 기장 상의·튜닉으로 상체를 길게, V넥으로 어깨 분산',
+    bottom: '미드라이즈 와이드 팬츠, 카고·플리츠 등 볼륨 있는 하의',
+    outer: '오버사이즈 롱 코트, 힙을 덮는 셔츠 재킷',
+    avoid: '크롭 상의 + 하이웨이스트 조합(상체가 더 짧아 보여요), 숄더패드',
+  },
+  'balanced-longTorso': {
+    top: '크롭·짧은 기장 상의, 상의를 하의에 넣는 턱인 스타일',
+    bottom: '하이웨이스트 팬츠·스커트로 다리를 길게',
+    outer: '짧은 기장 재킷·크롭 블루종',
+    avoid: '엉덩이를 덮는 긴 상의, 로우라이즈 팬츠',
+  },
+  'balanced-balanced': {
+    top: '대부분 잘 어울려요. 핏이 좋은 기본 티셔츠·셔츠',
+    bottom: '스트레이트·슬림 스트레이트 팬츠가 기본값',
+    outer: '테일러드 재킷, 트렌치코트 등 클래식 아이템',
+    avoid: '너무 과한 오버사이즈만 피하면 돼요',
+  },
+  'balanced-longLegs': {
+    top: '롱 기장 티셔츠·셔츠, 레이어드로 상체에 볼륨',
+    bottom: '미드라이즈·로우라이즈 팬츠, 스트레이트 핏',
+    outer: '힙을 덮는 롱 재킷·코트',
+    avoid: '크롭 상의 + 하이웨이스트(비율이 과장돼요)',
+  },
+  'triangle-longTorso': {
+    top: '보트넥·숄더 디테일·밝은색 상의로 어깨 강조, 크롭 기장',
+    bottom: '다크톤 하이웨이스트 스트레이트·부츠컷',
+    outer: '숄더라인이 살아 있는 짧은 재킷, 어깨 포인트 가디건',
+    avoid: '힙 라인에서 끝나는 상의, 밝은색 스키니',
+  },
+  'triangle-balanced': {
+    top: '보트넥·오프숄더·패턴 상의로 시선을 위로',
+    bottom: '다크톤 스트레이트·부츠컷, A라인 스커트',
+    outer: '숄더패드 블레이저, 구조적인 재킷',
+    avoid: '힙에 포인트 있는 하의(큰 포켓·밝은 패턴), 스키니',
+  },
+  'triangle-longLegs': {
+    top: '롱 기장·볼륨 있는 상의, 보트넥·퍼프 소매',
+    bottom: '미드라이즈 스트레이트·와이드, 다크톤',
+    outer: '어깨 포인트 있는 롱 코트',
+    avoid: '크롭 상의, 밝은색 타이트 하의',
+  },
+};
