@@ -27,7 +27,8 @@ export async function createDetector(): Promise<PoseDetector> {
   let lm: PoseLandmarker;
   try {
     lm = await build('GPU');
-  } catch {
+  } catch (gpuErr) {
+    console.warn('[detector] GPU delegate failed, falling back to CPU', gpuErr);
     lm = await build('CPU');
   }
   let lastTs = -1;

@@ -18,15 +18,24 @@ export async function openCamera(video: HTMLVideoElement): Promise<MediaStream> 
     if (name === 'NotAllowedError' || name === 'SecurityError') throw new CameraError('denied', name);
     throw new CameraError('unavailable', name);
   }
-  video.srcObject = stream;
-  video.muted = true;
-  video.playsInline = true;
-  await new Promise<void>((resolve) => {
-    if (video.readyState >= 2) return resolve();
-    video.onloadedmetadata = () => resolve();
-  });
-  await video.play();
-  return stream;
+  try {
+    video.srcObject = stream;
+    video.muted = true;
+    video.playsInline = true;
+    await new Promise<void>((resolve, reject) => {
+      if (video.readyState >= 2) return resolve();
+      const timer = setTimeout(() => reject(new Error('metadata timeout')), 10_000);
+      video.addEventListener('loadedmetadata', () => { clearTimeout(timer); resolve(); }, { once: true });
+      video.addEventListener('error', () => { clearTimeout(timer); reject(new Error('video error')); }, { once: true });
+    });
+    await video.play();
+    return stream;
+  } catch (e) {
+    // 어떤 이유로든 실패하면 카메라를 반드시 끈다(표시등이 켜진 채 남지 않도록)
+    for (const t of stream.getTracks()) t.stop();
+    video.srcObject = null;
+    throw new CameraError('unavailable', e instanceof Error ? e.message : String(e));
+  }
 }
 
 /** 트랙을 모두 멈추고 연결을 끊는다. 여러 번 호출해도 안전. */
