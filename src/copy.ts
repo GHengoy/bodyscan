@@ -165,6 +165,27 @@ export const UI_TEXT = {
   productPlaceholder: '어울리는 옷 추천 자리',
 } as const;
 
+export const RESULT_TEXT = {
+  gradeLabel: { good: '양호', warn: '주의', bad: '불균형' },
+  categoryLabel: { top: '상의', bottom: '하의', outer: '아우터' },
+  categoryEmoji: { top: '👕', bottom: '👖', outer: '🧥' },
+  allGood: '모든 항목 양호 ✨',
+  attention: (n: number) => `주의가 필요한 항목 ${n}개`,
+  proportionTitle: '체형 비율',
+  ratioShoulderHip: '어깨:골반',
+  ratioTorsoLeg: '상체:하체',
+  ratioThighCalf: '허벅지:종아리',
+  styleTitle: '어울리는 스타일 👗',
+  avoidLabel: '🚫 피하면 좋은 것',
+  productCta: '어울리는 옷 보기 →',
+  diagramFront: '정면',
+  diagramSide: '측면',
+  shareCardTagline: '저장 없는 실시간 체형분석',
+  shareCardFooter: '📵 영상은 저장되지 않았습니다 · 결과 수치만 담긴 카드입니다',
+  shareTitle: 'BodyScan 결과',
+  shareText: '저장 없는 실시간 체형분석 결과',
+} as const;
+
 export interface StyleAdvice {
   top: string;
   bottom: string;
