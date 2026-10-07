@@ -15,6 +15,7 @@ npm test           # Vitest 단위 테스트
 npm run build      # dist/ 생성
 ```
 
+- 서비스 워커 소스는 `src/sw.template.js`이며 빌드 시 `dist/sw.js`로 내보내집니다.
 - 데스크톱 크롬에서 테스트: `http://localhost:5173/?desktop=1`
 - 같은 Wi-Fi의 폰에서 테스트: 카메라는 HTTPS 필수 → `npx vite --host`는 http라 폰에서 카메라가 열리지 않습니다. `npx localtunnel --port 5173` 또는 `cloudflared tunnel --url http://localhost:5173`로 https 주소를 만들어 접속하세요.
 
@@ -28,7 +29,7 @@ npm run build      # dist/ 생성
 
 | 필드 | 설명 |
 |---|---|
-| `bodyType` | `inverted|balanced|triangle` - `longTorso|balanced|longLegs` 조합(예: `inverted-longLegs`) 또는 `any` |
+| `bodyType` | `inverted` / `balanced` / `triangle` - `longTorso` / `balanced` / `longLegs` 조합(예: `inverted-longLegs`) 또는 `any` |
 | `category` | `top` / `bottom` / `outer` |
 | `image`, `name`, `price`, `url` | 표시 정보와 제휴 링크 |
 
@@ -36,7 +37,7 @@ npm run build      # dist/ 생성
 
 ## 배포
 
-정적 산출물(`dist/`)을 Vercel / Netlify / Cloudflare Pages에 올리면 끝. 빌드 명령 `npm run build`, 출력 `dist`. HTTPS는 자동.
+정적 산출물(`dist/`)을 Vercel / Netlify / Cloudflare Pages에 올리면 끝. 빌드 명령 `npm run build`, 출력 `dist`. HTTPS는 자동. 빌드마다 `sw.js`에 새 캐시 이름과 해시 자산 목록이 자동으로 들어가므로 배포 후 사용자는 다음 방문(온라인)에서 새 버전을 받습니다. 수동으로 캐시 이름을 올릴 필요 없습니다.
 
 ## 프라이버시 구조
 
