@@ -1,4 +1,4 @@
-import type { PostureItemId, Headline } from './analysis/grade';
+import type { PostureItemId, Headline, GradedItem } from './analysis/grade';
 import type { ShoulderHipType, TorsoLegType } from './analysis/proportion';
 import type { BodyTypeKey } from './analysis/style';
 
@@ -96,6 +96,18 @@ export const VARIANT_LABEL: Record<string, string> = {
   forward: '앞으로',
   backward: '뒤로',
 };
+
+/** 등급별 템플릿을 실제 수치로 채운 항목 메시지 */
+export function postureMessage(item: GradedItem): string {
+  const c = POSTURE_COPY[item.id];
+  return fillTemplate(c[item.grade], {
+    deg: item.value.toFixed(1),
+    pct: item.value.toFixed(1),
+    ratio: item.value.toFixed(2),
+    side: sideLabel(item.variant),
+    variantLabel: VARIANT_LABEL[item.variant] ?? '',
+  });
+}
 
 export const HEADLINES: Record<string, { title: string; sub: string }> = {
   perfect: { title: '운동선수처럼 완벽합니다 🏅', sub: '모든 항목이 양호 범위예요. 지금 자세를 유지하세요!' },
