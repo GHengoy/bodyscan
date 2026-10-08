@@ -280,6 +280,11 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
   window.scrollTo(0, 0);
   // 카메라가 꺼졌고 렌더까지 끝난 뒤에만 허용 — 도중에 예외가 나면 광고는 꺼진 채로 문서 내 재시도 가능
   setAdsAllowed(true);
+  // 허용 이후 결과 화면의 광고 슬롯을 실제 광고로 다시 마운트
+  for (const el of app.querySelectorAll<HTMLElement>('.ad-slot')) {
+    const s = el.dataset.slot ?? '';
+    mountBanner(el, s === 'result1' ? AD_SLOTS.result1 : s === 'result2' ? AD_SLOTS.result2 : AD_SLOTS.native);
+  }
 }
 
 // ---------- 생명주기 ----------
