@@ -9,9 +9,13 @@ function swPrecache(): Plugin {
     generateBundle(_options, bundle) {
       const assets = Object.keys(bundle).filter((f) => f.startsWith('assets/')).map((f) => '/' + f);
       const template = readFileSync(fileURLToPath(new URL('./src/sw.template.js', import.meta.url)), 'utf8');
+      const mpPkg = JSON.parse(
+        readFileSync(fileURLToPath(new URL('./node_modules/@mediapipe/tasks-vision/package.json', import.meta.url)), 'utf8'),
+      ) as { version: string };
       const source = template
         .replace('__BUILD_ASSETS__', JSON.stringify(assets))
-        .replace('__BUILD_ID__', Date.now().toString(36));
+        .replace('__BUILD_ID__', Date.now().toString(36))
+        .replace('__MP_VERSION__', mpPkg.version);
       this.emitFile({ type: 'asset', fileName: 'sw.js', source });
     },
   };

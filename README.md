@@ -16,6 +16,10 @@ npm run build      # dist/ 생성
 ```
 
 - 서비스 워커 소스는 `src/sw.template.js`이며 빌드 시 `dist/sw.js`로 내보내집니다.
+  - 설치 시 앱 셸(`/`, `index.html`, manifest, 아이콘, `products.json`)과 해시 자산만 프리캐시합니다(빌드별 캐시 `bodyscan-<빌드ID>`).
+  - 모델(`/models/`)·WASM(`/wasm/`)은 처음 요청될 때 cache-first로 받아 MediaPipe 버전별 캐시 `bodyscan-mp-<버전>`에 보관합니다. 앱을 다시 배포해도 이 캐시는 지우지 않으며, `@mediapipe/tasks-vision` 버전을 올리면 새 캐시로 바뀝니다(버전은 `package.json`에 정확히 고정).
+  - HTML 페이지는 network-first, 그 외 같은 출처 요청은 cache-first이며 `text/html` 응답(SPA 폴백)은 자산 자리에 캐시하지 않습니다.
+- 오프라인: 최초 측정에서 모델이 내려받아지면 이후 오프라인(비행기 모드)에서도 동작합니다.
 - 데스크톱 크롬에서 테스트: `http://localhost:5173/?desktop=1`
 - 같은 Wi-Fi의 폰에서 테스트: 카메라는 HTTPS 필수 → `npx vite --host`는 http라 폰에서 카메라가 열리지 않습니다. `npx localtunnel --port 5173` 또는 `cloudflared tunnel --url http://localhost:5173`로 https 주소를 만들어 접속하세요.
 
@@ -55,5 +59,5 @@ npm run build      # dist/ 생성
 - [ ] 측정 끝나면 카메라 표시등(상단 녹색/주황 점) 꺼짐
 - [ ] 결과 화면 공유 버튼 → OS 공유 시트에 PNG 카드
 - [ ] 새로고침 후 결과 사라짐
-- [ ] 두 번째 방문: 비행기 모드에서 사이트 열어 측정 가능(PWA 캐시)
+- [ ] 온라인에서 한 번 측정한 뒤(모델 캐시) 비행기 모드에서 사이트 열어 측정 가능(PWA 캐시)
 - [ ] 측정 중 홈 화면으로 나갔다 돌아오면 카메라 준비 단계부터 재시작
