@@ -4,7 +4,7 @@
 // 실행: npm run e2e  (vite dev 서버를 직접 띄우고 끝나면 내린다)
 import puppeteer from 'puppeteer-core';
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -173,8 +173,17 @@ try {
     if (!ok) failed = true;
   }
 
-  // 공유 시트는 헤드리스 크롬에서 불가 → 버튼 상태만 기록(미지원이면 비활성 + 안내 문구)
+  // 공유 시트는 헤드리스 크롬에서 불가 → 버튼 상태만 기록하고, 카드 PNG는 dev 훅으로 직접 뽑아 저장
   log('share button: ' + JSON.stringify(result.shareBtn));
+  const card = await page.evaluate(() => {
+    const c = window.__bodyscanRenderShareCard?.();
+    return c ? { w: c.width, h: c.height, png: c.toDataURL('image/png') } : null;
+  });
+  if (!card) { console.log('  ✗ share card hook missing'); failed = true; }
+  else {
+    writeFileSync(join(OUT, '05-share-card.png'), Buffer.from(card.png.split(',')[1], 'base64'));
+    console.log(`  ✓ share card rendered ${card.w}x${card.h} → .e2e/05-share-card.png`);
+  }
 
   await browser.close();
 } catch (e) {

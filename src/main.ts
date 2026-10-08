@@ -18,6 +18,7 @@ import { loadProducts, type Product } from './ads/products';
 import { renderQr } from './ui/qr';
 import { speak, setVoiceEnabled, isVoiceEnabled } from './speech';
 import { renderResult, type ResultData } from './ui/result';
+import { renderShareCard } from './ui/shareCard';
 
 type Phase = 'setup' | 'front' | 'side';
 
@@ -284,6 +285,10 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
   };
   renderResult(app, data, { products, onRetry: () => location.assign(captureUrl()) });
   window.scrollTo(0, 0);
+  if (import.meta.env.DEV) {
+    // E2E가 공유 카드 PNG를 뽑아 볼 수 있게 노출(프로덕션 번들에서는 제거됨)
+    (window as unknown as { __bodyscanRenderShareCard?: () => HTMLCanvasElement }).__bodyscanRenderShareCard = () => renderShareCard(data);
+  }
   // 카메라가 꺼졌고 렌더까지 끝난 뒤에만 허용 — 도중에 예외가 나면 광고는 꺼진 채로 문서 내 재시도 가능
   setAdsAllowed(true);
   // 허용 이후 결과 화면의 광고 슬롯을 실제 광고로 다시 마운트
