@@ -2,8 +2,9 @@ import { FilesetResolver, PoseLandmarker } from '@mediapipe/tasks-vision';
 import type { Pose } from './landmarks';
 
 export interface PoseDetector {
-  /** 같은 nowMs로 두 번 호출하지 않는다(MediaPipe는 단조 증가 타임스탬프 요구) */
+  /** 같은 nowMs로 두 번 호출하지 않는다(MediaPipe는 단조 증가 타임스탬프 요구). close 이후에는 null */
   detect(video: HTMLVideoElement, nowMs: number): Pose | null;
+  /** 여러 번 호출해도 안전 */
   close(): void;
 }
 
@@ -32,9 +33,10 @@ export async function createDetector(): Promise<PoseDetector> {
     lm = await build('CPU');
   }
   let lastTs = -1;
+  let closed = false;
   return {
     detect(video, nowMs) {
-      if (video.readyState < 2 || video.videoWidth === 0) return null;
+      if (closed || video.readyState < 2 || video.videoWidth === 0) return null;
       const ts = Math.max(nowMs, lastTs + 1);
       lastTs = ts;
       const res = lm.detectForVideo(video, ts);
@@ -43,6 +45,8 @@ export async function createDetector(): Promise<PoseDetector> {
       return first.map((p) => ({ x: p.x, y: p.y, z: p.z, visibility: p.visibility ?? 0 }));
     },
     close() {
+      if (closed) return;
+      closed = true;
       lm.close();
     },
   };

@@ -25,6 +25,8 @@ const app = document.querySelector<HTMLDivElement>('#app')!;
 const $ = <T extends HTMLElement>(sel: string) => app.querySelector<T>(sel)!;
 
 let detector: PoseDetector | null = null;
+/** 모델 로딩은 한 번만(동시 호출도 같은 Promise). 실패하면 다음 시도에서 다시 만든다. */
+let detectorP: Promise<PoseDetector> | null = null;
 let products: Product[] = [];
 let capturing = false;
 let resumeOnVisible = false;
@@ -84,6 +86,13 @@ function showError(title: string, body: string, onRetry: () => void): void {
 
 // ---------- 측정 ----------
 
+function getDetector(): Promise<PoseDetector> {
+  return (detectorP ??= createDetector().catch((e: unknown) => {
+    detectorP = null;
+    throw e;
+  }));
+}
+
 function stopCapture(): void {
   runId++;
   capturing = false;
@@ -111,6 +120,9 @@ async function runCapture(): Promise<void> {
   voiceToggle.checked = isVoiceEnabled();
   voiceToggle.onchange = () => setVoiceEnabled(voiceToggle.checked);
 
+  const privacyEl = $('#privacy');
+  statusEl.textContent = UI_TEXT.cameraStarting;
+  privacyEl.textContent = UI_TEXT.cameraStarting;
   try {
     await openCamera(video);
   } catch (e) {
@@ -129,19 +141,20 @@ async function runCapture(): Promise<void> {
     return;
   }
 
-  if (!detector) {
-    statusEl.textContent = UI_TEXT.loadingModel;
-    try {
-      detector = await createDetector();
-    } catch {
-      if (myRun !== runId) {
-        closeCamera(video);
-        return;
-      }
-      stopCapture();
-      showError(UI_TEXT.modelFailed, UI_TEXT.modelFailedBody, () => void runCapture());
+  statusEl.textContent = UI_TEXT.loadingModel;
+  privacyEl.textContent = UI_TEXT.loadingModel;
+  let det: PoseDetector;
+  try {
+    det = await getDetector();
+    detector = det;
+  } catch {
+    if (myRun !== runId) {
+      closeCamera(video);
       return;
     }
+    stopCapture();
+    showError(UI_TEXT.modelFailed, UI_TEXT.modelFailedBody, () => void runCapture());
+    return;
   }
 
   if (myRun !== runId) {
@@ -150,7 +163,7 @@ async function runCapture(): Promise<void> {
   }
 
   // 모델 로딩이 끝난 뒤부터 네트워크 요청을 센다
-  privacy = createPrivacyIndicator($('#privacy'));
+  privacy = createPrivacyIndicator(privacyEl);
   privacy.start();
   capturing = true;
 
@@ -181,7 +194,7 @@ async function runCapture(): Promise<void> {
         canvas.height = h;
       }
       ctx.clearRect(0, 0, w, h);
-      const pose = detector!.detect(video, now);
+      const pose = det.detect(video, now);
 
       if (phase === 'setup') {
         const ok = !!pose && fullBodyVisible(pose);
@@ -233,6 +246,10 @@ async function runCapture(): Promise<void> {
       rafId = requestAnimationFrame(loop);
     } catch (err) {
       console.error('[loop]', err);
+      // 손상된 엔진일 수 있으니 버리고, 다시 시도 시 새로 만든다
+      try { detector?.close(); } catch { /* 무시 */ }
+      detectorP = null;
+      detector = null;
       stopCapture();
       showError(UI_TEXT.detectFailed, UI_TEXT.detectFailedBody, () => void runCapture());
     }

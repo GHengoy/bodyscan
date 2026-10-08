@@ -4,19 +4,38 @@ export class CameraError extends Error {
   }
 }
 
+/** 권한 프롬프트·장치 응답 대기 상한 */
+const GUM_TIMEOUT_MS = 20_000;
+
 /** 전면 카메라를 열어 video에 연결. 반환된 스트림은 closeCamera로 반드시 닫는다. */
 export async function openCamera(video: HTMLVideoElement): Promise<MediaStream> {
   if (!navigator.mediaDevices?.getUserMedia) throw new CameraError('unavailable', 'getUserMedia 미지원');
   let stream: MediaStream;
+  let timedOut = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const gum = navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 1280 } },
+    audio: false,
+  });
+  // 타임아웃 뒤에 늦게 열린 스트림은 즉시 끈다(표시등이 켜진 채 남지 않도록)
+  gum.then((s) => { if (timedOut) for (const t of s.getTracks()) t.stop(); }, () => {});
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 1280 } },
-      audio: false,
-    });
+    stream = await Promise.race([
+      gum,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          timedOut = true;
+          reject(new CameraError('unavailable', 'timeout'));
+        }, GUM_TIMEOUT_MS);
+      }),
+    ]);
   } catch (e) {
+    if (e instanceof CameraError) throw e;
     const name = (e as DOMException).name;
     if (name === 'NotAllowedError' || name === 'SecurityError') throw new CameraError('denied', name);
     throw new CameraError('unavailable', name);
+  } finally {
+    clearTimeout(timer);
   }
   try {
     video.srcObject = stream;

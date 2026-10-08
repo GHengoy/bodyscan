@@ -25,6 +25,26 @@ export function pickProduct(
   return pool[Math.min(pool.length - 1, Math.floor(rand() * pool.length))];
 }
 
+const CATEGORIES: readonly string[] = ['top', 'bottom', 'outer'];
+const BODY_TYPE_RE = /^(inverted|balanced|triangle)-(longTorso|balanced|longLegs)$/;
+const URL_RE = /^https?:\/\//;
+
+function isProduct(row: unknown): row is Product {
+  if (typeof row !== 'object' || row === null) return false;
+  const r = row as Record<string, unknown>;
+  const fields = ['image', 'name', 'price', 'url', 'bodyType', 'category'] as const;
+  if (!fields.every((f) => typeof r[f] === 'string')) return false;
+  const { url, bodyType, category } = r as Record<(typeof fields)[number], string>;
+  return CATEGORIES.includes(category)
+    && (bodyType === 'any' || BODY_TYPE_RE.test(bodyType))
+    && URL_RE.test(url);
+}
+
+/** products.json 내용 검증: 배열이 아니면 [], 형식이 틀린 행은 버린다 */
+export function sanitizeProducts(data: unknown): Product[] {
+  return Array.isArray(data) ? data.filter(isProduct) : [];
+}
+
 /**
  * 시작 화면에서 미리 호출한다(결과 화면에서 네트워크 요청이 생기지 않도록).
  * 이 앱에서 fetch가 허용된 유일한 앱 코드.
@@ -34,7 +54,7 @@ export async function loadProducts(url = '/products.json'): Promise<Product[]> {
     const res = await fetch(url, { cache: 'force-cache' });
     if (!res.ok) return [];
     const data: unknown = await res.json();
-    return Array.isArray(data) ? (data as Product[]) : [];
+    return sanitizeProducts(data);
   } catch {
     return [];
   }

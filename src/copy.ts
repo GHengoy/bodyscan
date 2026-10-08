@@ -142,6 +142,7 @@ export const UI_TEXT = {
     '밝은 곳, 몸에 붙는 옷이 정확해요',
     '발은 골반 너비로 벌리고 팔은 자연스럽게 내려 주세요',
   ],
+  cameraStarting: '카메라 권한을 허용해 주세요',
   loadingModel: '분석 엔진 준비 중…',
   privacyOk: '📵 네트워크 전송 0건 · 영상은 이 기기 밖으로 나가지 않습니다',
   privacyBad: (n: number) => `⚠️ 네트워크 요청 ${n}건 감지`,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickProduct, type Product } from '../src/ads/products';
+import { pickProduct, sanitizeProducts, type Product } from '../src/ads/products';
 
 const P = (over: Partial<Product>): Product => ({
   image: '', name: 'n', price: '₩10,000', url: 'https://example.com', bodyType: 'any', category: 'top', ...over,
@@ -24,5 +24,29 @@ describe('pickProduct', () => {
     const two = [P({ name: 'a' }), P({ name: 'b' })];
     expect(pickProduct(two, 'balanced-balanced', 'top', () => 0)!.name).toBe('a');
     expect(pickProduct(two, 'balanced-balanced', 'top', () => 0.99)!.name).toBe('b');
+  });
+});
+
+describe('sanitizeProducts', () => {
+  const valid = P({ name: 'ok', bodyType: 'triangle-longLegs', category: 'outer', url: 'https://example.com/a' });
+  it('keeps valid rows', () => {
+    expect(sanitizeProducts([valid, P({ name: 'any' })])).toEqual([valid, P({ name: 'any' })]);
+  });
+  it('drops rows with non-string fields (numeric price)', () => {
+    expect(sanitizeProducts([{ ...valid, price: 10000 }, valid])).toEqual([valid]);
+  });
+  it('drops rows with bad category, body type, url, or missing fields', () => {
+    expect(sanitizeProducts([
+      { ...valid, category: 'shoes' },
+      { ...valid, bodyType: 'inverted-tall' },
+      { ...valid, url: 'javascript:alert(1)' },
+      { name: 'only name' },
+      null,
+      'str',
+    ])).toEqual([]);
+  });
+  it('non-array → []', () => {
+    expect(sanitizeProducts({ items: [valid] })).toEqual([]);
+    expect(sanitizeProducts(null)).toEqual([]);
   });
 });
