@@ -10,9 +10,18 @@ export const AD_SLOTS = {
 };
 
 let scriptLoaded = false;
+/**
+ * 카메라가 켜질 수 있는 문서에서는 광고 스크립트를 절대 로드하지 않는다.
+ * 시작 화면 문서, 또는 측정 문서에서 카메라를 완전히 끈 뒤(결과 화면)에만 true로 바꾼다.
+ */
+let adsAllowed = false;
+
+export function setAdsAllowed(allowed: boolean): void {
+  adsAllowed = allowed;
+}
 
 function ensureScript(): void {
-  if (scriptLoaded || !CLIENT) return;
+  if (scriptLoaded || !CLIENT || !adsAllowed) return;
   const s = document.createElement('script');
   s.async = true;
   s.crossOrigin = 'anonymous';
@@ -23,11 +32,11 @@ function ensureScript(): void {
 
 /**
  * 광고는 start/result 화면에서만 마운트한다. 카메라 화면에서는 호출 금지.
- * client나 slot이 없으면 플레이스홀더만 그린다(개발·승인 전 상태).
+ * client·slot이 없거나 광고가 허용되지 않은 상태(setAdsAllowed)면 플레이스홀더만 그린다.
  */
 export function mountBanner(el: HTMLElement, slot: string | undefined): void {
   el.innerHTML = '';
-  if (!CLIENT || !slot) {
+  if (!CLIENT || !slot || !adsAllowed) {
     el.innerHTML = `<div class="ad-placeholder">${UI_TEXT.adPlaceholder}</div>`;
     return;
   }

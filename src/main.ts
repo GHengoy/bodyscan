@@ -13,7 +13,7 @@ import { recommendStyle } from './analysis/style';
 import { startScreen, cameraScreen, errorScreen, desktopScreen } from './ui/screens';
 import { createPrivacyIndicator, type PrivacyIndicator } from './ui/privacy';
 import { drawSkeleton, drawGuide, drawProgressRing } from './ui/overlay';
-import { mountBanner, unmountBanners, AD_SLOTS } from './ads/banner';
+import { mountBanner, unmountBanners, setAdsAllowed, AD_SLOTS } from './ads/banner';
 import { loadProducts, type Product } from './ads/products';
 import { renderQr } from './ui/qr';
 import { speak, setVoiceEnabled, isVoiceEnabled } from './speech';
@@ -39,20 +39,35 @@ const setText = (el: HTMLElement, t: string) => {
 
 const SETUP_TIMEOUT_MS = 30_000;
 
+const params = new URLSearchParams(location.search);
+/** 측정은 광고 스크립트가 전혀 로드되지 않는 별도 문서(/?capture=1)에서 실행한다 */
+const CAPTURE_MODE = params.get('capture') === '1';
+
 function isMobile(): boolean {
-  if (new URLSearchParams(location.search).get('desktop') === '1') return true;
+  if (params.get('desktop') === '1') return true;
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1;
+}
+
+/** 측정 문서 URL. 개발용 desktop=1 오버라이드는 유지한다. */
+function captureUrl(): string {
+  return params.get('desktop') === '1' ? '/?capture=1&desktop=1' : '/?capture=1';
 }
 
 // ---------- 화면 ----------
 
 function showStart(): void {
+  setAdsAllowed(true); // 시작 화면 문서에서는 카메라를 켜지 않는다
   app.innerHTML = startScreen();
   mountBanner($('[data-slot="start"]'), AD_SLOTS.start);
   $('#start-btn').onclick = (e) => {
     (e.currentTarget as HTMLButtonElement).disabled = true;
-    void runCapture();
+    location.assign(captureUrl());
   };
+  preloadProducts(); // HTTP 캐시를 데워 둔다(측정 문서에서 다시 읽음)
+}
+
+/** 결과 화면에서 네트워크 요청이 생기지 않도록 미리 읽어 둔다 */
+function preloadProducts(): void {
   if (products.length === 0) void loadProducts().then((p) => (products = p));
 }
 
@@ -227,6 +242,8 @@ async function runCapture(): Promise<void> {
 
 function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
   stopCapture();
+  // 카메라가 꺼졌고, 다시 측정은 새 문서로 이동하므로 이 문서에서 다시 켜지지 않는다
+  setAdsAllowed(true);
   speak(UI_TEXT.measureDone);
   const front = analyzeFront(frontPose, aspect);
   const side = analyzeSide(sidePose, aspect);
@@ -238,7 +255,7 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
     style: recommendStyle(proportion),
     frontPose, sidePose, aspect,
   };
-  renderResult(app, data, { products, onRetry: () => void runCapture() });
+  renderResult(app, data, { products, onRetry: () => location.assign(captureUrl()) });
   window.scrollTo(0, 0);
 }
 
@@ -261,5 +278,9 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js'));
 }
 
-if (isMobile()) showStart();
-else void showDesktop();
+if (!isMobile()) void showDesktop();
+else if (CAPTURE_MODE) {
+  preloadProducts();
+  void runCapture();
+}
+else showStart();
