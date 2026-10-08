@@ -20,6 +20,10 @@ export function setAdsAllowed(allowed: boolean): void {
   adsAllowed = allowed;
 }
 
+export function isAdsAllowed(): boolean {
+  return adsAllowed;
+}
+
 function ensureScript(): void {
   if (scriptLoaded || !CLIENT || !adsAllowed) return;
   const s = document.createElement('script');

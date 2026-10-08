@@ -13,7 +13,7 @@ import { recommendStyle } from './analysis/style';
 import { startScreen, cameraScreen, errorScreen, desktopScreen } from './ui/screens';
 import { createPrivacyIndicator, type PrivacyIndicator } from './ui/privacy';
 import { drawSkeleton, drawGuide, drawProgressRing } from './ui/overlay';
-import { mountBanner, unmountBanners, setAdsAllowed, AD_SLOTS } from './ads/banner';
+import { mountBanner, unmountBanners, setAdsAllowed, isAdsAllowed, AD_SLOTS } from './ads/banner';
 import { loadProducts, type Product } from './ads/products';
 import { renderQr } from './ui/qr';
 import { speak, setVoiceEnabled, isVoiceEnabled } from './speech';
@@ -75,8 +75,9 @@ function preloadProducts(): void {
 
 async function showDesktop(): Promise<void> {
   app.innerHTML = desktopScreen();
-  $('#desktop-url').textContent = location.href;
-  await renderQr($('#qr'), location.href);
+  const url = location.origin + '/';
+  $('#desktop-url').textContent = url;
+  await renderQr($('#qr'), url);
 }
 
 function showError(title: string, body: string, onRetry: () => void): void {
@@ -104,6 +105,11 @@ function stopCapture(): void {
 }
 
 async function runCapture(): Promise<void> {
+  if (isAdsAllowed()) {
+    // 광고 스크립트가 이미 로드된 문서에서는 카메라를 다시 열지 않는다 → 새 문서로
+    location.assign(captureUrl());
+    return;
+  }
   const myRun = ++runId;
   unmountBanners();
   app.innerHTML = cameraScreen();
@@ -259,8 +265,6 @@ async function runCapture(): Promise<void> {
 
 function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
   stopCapture();
-  // 카메라가 꺼졌고, 다시 측정은 새 문서로 이동하므로 이 문서에서 다시 켜지지 않는다
-  setAdsAllowed(true);
   speak(UI_TEXT.measureDone);
   const front = analyzeFront(frontPose, aspect);
   const side = analyzeSide(sidePose, aspect);
@@ -274,6 +278,8 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
   };
   renderResult(app, data, { products, onRetry: () => location.assign(captureUrl()) });
   window.scrollTo(0, 0);
+  // 카메라가 꺼졌고 렌더까지 끝난 뒤에만 허용 — 도중에 예외가 나면 광고는 꺼진 채로 문서 내 재시도 가능
+  setAdsAllowed(true);
 }
 
 // ---------- 생명주기 ----------
@@ -290,6 +296,12 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 window.addEventListener('pagehide', stopCapture);
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    const b = document.querySelector<HTMLButtonElement>('#start-btn');
+    if (b) b.disabled = false;
+  }
+});
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js'));

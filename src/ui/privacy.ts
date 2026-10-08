@@ -9,7 +9,7 @@ export interface PrivacyIndicator {
 /**
  * 측정 중 네트워크 요청이 0건임을 사용자에게 보여준다.
  * start() 이후 시작된 리소스 요청만 센다(모델/WASM 로딩은 start 전에 끝나야 한다).
- * 광고 iframe 내부 요청은 메인 문서 타임라인에 잡히지 않는다 — 그래서 광고는 카메라 화면에 두지 않는다.
+ * 광고 스크립트는 카메라가 꺼진 뒤에만 로드된다(측정은 별도 문서) — 그래서 측정 중 요청은 0건이어야 한다.
  */
 export function createPrivacyIndicator(el: HTMLElement): PrivacyIndicator {
   let count = 0;

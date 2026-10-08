@@ -14,7 +14,8 @@ const wasmDst = join(root, 'public', 'wasm');
 mkdirSync(modelDir, { recursive: true });
 mkdirSync(wasmDst, { recursive: true });
 
-for (const f of readdirSync(wasmSrc)) copyFileSync(join(wasmSrc, f), join(wasmDst, f));
+// vision_wasm_module_internal 은 forVisionTasks(path, true) 일 때만 요청된다(미사용) → 제외
+for (const f of readdirSync(wasmSrc).filter((n) => !n.includes('vision_wasm_module_internal'))) copyFileSync(join(wasmSrc, f), join(wasmDst, f));
 console.log(`[assets] wasm copied → public/wasm`);
 
 if (!existsSync(modelPath)) {
