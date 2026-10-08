@@ -8,8 +8,9 @@ export interface PoseDetector {
   close(): void;
 }
 
-const MODEL_PATH = '/models/pose_landmarker_lite.task';
-const WASM_PATH = '/wasm';
+// 배포 경로(BASE_URL)는 '/'로 끝난다 — 하위 경로 배포(GitHub Pages 등)에서도 같은 출처에서 로드
+const MODEL_PATH = `${import.meta.env.BASE_URL}models/pose_landmarker_lite.task`;
+const WASM_PATH = `${import.meta.env.BASE_URL}wasm`;
 
 async function build(delegate: 'GPU' | 'CPU'): Promise<PoseLandmarker> {
   const fileset = await FilesetResolver.forVisionTasks(WASM_PATH);

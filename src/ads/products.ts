@@ -49,7 +49,7 @@ export function sanitizeProducts(data: unknown): Product[] {
  * 시작 화면에서 미리 호출한다(결과 화면에서 네트워크 요청이 생기지 않도록).
  * 이 앱에서 fetch가 허용된 유일한 앱 코드.
  */
-export async function loadProducts(url = '/products.json'): Promise<Product[]> {
+export async function loadProducts(url = `${import.meta.env.BASE_URL}products.json`): Promise<Product[]> {
   try {
     const res = await fetch(url, { cache: 'force-cache' });
     if (!res.ok) return [];

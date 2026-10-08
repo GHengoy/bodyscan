@@ -1,16 +1,18 @@
-// 빌드 시 vite.config.ts의 swPrecache 플러그인이 자리표시자(빌드 ID, MediaPipe 버전, 해시 자산 목록)를 치환해 dist/sw.js 로 내보낸다.
+// 빌드 시 vite.config.ts의 swPrecache 플러그인이 자리표시자(빌드 ID, MediaPipe 버전, 해시 자산 목록, 배포 경로)를 치환해 dist/sw.js 로 내보낸다.
 // - 앱 셸 + 해시 자산만 설치 시 프리캐시(빌드별 캐시, 새 빌드 활성화 시 이전 것 삭제).
-// - 모델(/models/)·WASM(/wasm/)은 최초 측정 때 cache-first로 받아 MediaPipe 버전별 별도 캐시에 보관
+// - 모델(models/)·WASM(wasm/)은 최초 측정 때 cache-first로 받아 MediaPipe 버전별 별도 캐시에 보관
 //   (앱을 다시 배포해도 수 MB를 다시 내려받지 않는다). 이후 오프라인 동작.
 // - 네비게이션(HTML)은 network-first → 새 배포가 즉시 반영된다.
+const BASE = '__BASE__'; // '/' 또는 '/bodyscan/' 처럼 슬래시로 끝남
 const CACHE = 'bodyscan-__BUILD_ID__';
 const MP_CACHE = 'bodyscan-mp-__MP_VERSION__';
+const INDEX = BASE + 'index.html';
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icon.svg',
-  '/products.json',
+  BASE,
+  INDEX,
+  BASE + 'manifest.webmanifest',
+  BASE + 'icon.svg',
+  BASE + 'products.json',
 ].concat(__BUILD_ASSETS__);
 
 self.addEventListener('install', (event) => {
@@ -42,17 +44,17 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  const isNavigation = req.mode === 'navigate' || url.pathname === '/index.html';
+  const isNavigation = req.mode === 'navigate' || url.pathname === INDEX;
   if (isNavigation) {
     event.respondWith(
       fetch(req)
         .then((res) => { if (res.ok) putSafe(event, CACHE, req, res); return res; })
-        .catch(() => caches.match(req).then((hit) => hit || caches.match('/index.html'))),
+        .catch(() => caches.match(req).then((hit) => hit || caches.match(INDEX))),
     );
     return;
   }
 
-  const isMediaPipe = url.pathname.startsWith('/models/') || url.pathname.startsWith('/wasm/');
+  const isMediaPipe = url.pathname.startsWith(BASE + 'models/') || url.pathname.startsWith(BASE + 'wasm/');
   const cacheName = isMediaPipe ? MP_CACHE : CACHE;
   event.respondWith(
     caches.open(cacheName)

@@ -42,9 +42,16 @@ npm run build      # dist/ 생성
 
 해당 체형·카테고리 상품이 없으면 `any`, 그래도 없으면 네이티브 광고 유닛(`VITE_ADSENSE_SLOT_NATIVE`)으로 폴백합니다.
 
+기본 데이터는 9개 체형 × 3개 카테고리 = 27개 항목이며, 각 항목은 스타일 추천 문구와 맞는 키워드의 **쿠팡 검색 결과 링크**입니다(실제 상품 목록으로 연결되지만 수익은 잡히지 않음). 수익화하려면:
+1. [쿠팡 파트너스](https://partners.coupang.com/) 가입 → "링크 생성"에서 각 키워드(또는 특정 상품)의 파트너스 링크(`https://link.coupang.com/a/…`)를 만들어 `url`에 넣고, 원하면 `image`·`price`도 채웁니다.
+2. 또는 [Google AdSense](https://www.google.com/adsense/) 승인 후 `.env`의 `VITE_ADSENSE_CLIENT`(ca-pub-…)와 슬롯 ID를 넣으면 배너와 네이티브 슬롯에 실제 광고가 나옵니다.
+   GitHub Pages 배포는 로컬 `.env` 값으로 빌드되므로 값을 넣은 뒤 `npm run deploy`를 실행하면 반영됩니다.
+
 ## 배포
 
-정적 산출물(`dist/`)을 Vercel / Netlify / Cloudflare Pages에 올리면 끝. 빌드 명령 `npm run build`, 출력 `dist`. HTTPS는 자동. `vercel.json`과 `netlify.toml`에 빌드 설정과 보안·캐시 헤더(`Permissions-Policy: camera=(self)`, 모델/WASM/해시 자산 1년 캐시, `sw.js` no-cache)가 들어 있어 저장소를 연결하면 그대로 적용됩니다. 빌드마다 `sw.js`에 새 캐시 이름과 해시 자산 목록이 자동으로 들어가므로 배포 후 사용자는 다음 방문(온라인)에서 새 버전을 받습니다. 수동으로 캐시 이름을 올릴 필요 없습니다.
+**현재 배포 주소: https://ghengoy.github.io/bodyscan/** — `npm run deploy`가 `BASE_PATH=/bodyscan/`로 빌드한 `dist/`를 `gh-pages` 브랜치로 푸시하고, GitHub Pages가 그 브랜치를 서빙합니다(반영 1~2분). 광고 ID를 넣으려면 `.env`에 `VITE_ADSENSE_*`를 채운 뒤 `npm run deploy`를 다시 실행하세요. 하위 경로 배포라 코드의 모든 경로는 `import.meta.env.BASE_URL`을 기준으로 하며, 서비스 워커도 빌드 시 `BASE`가 주입됩니다. 루트(`/`)에 올리는 호스팅에서는 `BASE_PATH` 없이 빌드하면 됩니다.
+
+다른 호스팅: 정적 산출물(`dist/`)을 Vercel / Netlify / Cloudflare Pages에 올리면 끝. 빌드 명령 `npm run build`, 출력 `dist`. HTTPS는 자동. `vercel.json`과 `netlify.toml`에 빌드 설정과 보안·캐시 헤더(`Permissions-Policy: camera=(self)`, 모델/WASM/해시 자산 1년 캐시, `sw.js` no-cache)가 들어 있어 저장소를 연결하면 그대로 적용됩니다. 빌드마다 `sw.js`에 새 캐시 이름과 해시 자산 목록이 자동으로 들어가므로 배포 후 사용자는 다음 방문(온라인)에서 새 버전을 받습니다. 수동으로 캐시 이름을 올릴 필요 없습니다.
 
 ## 프라이버시 구조
 

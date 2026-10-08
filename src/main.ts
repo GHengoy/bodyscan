@@ -52,7 +52,8 @@ function isMobile(): boolean {
 
 /** 측정 문서 URL. 개발용 desktop=1 오버라이드는 유지한다. */
 function captureUrl(): string {
-  return params.get('desktop') === '1' ? '/?capture=1&desktop=1' : '/?capture=1';
+  const base = import.meta.env.BASE_URL; // '/' 또는 '/bodyscan/'
+  return params.get('desktop') === '1' ? `${base}?capture=1&desktop=1` : `${base}?capture=1`;
 }
 
 // ---------- 화면 ----------
@@ -75,7 +76,7 @@ function preloadProducts(): void {
 
 async function showDesktop(): Promise<void> {
   app.innerHTML = desktopScreen();
-  const url = location.origin + '/';
+  const url = location.origin + import.meta.env.BASE_URL;
   $('#desktop-url').textContent = url;
   await renderQr($('#qr'), url);
 }
@@ -314,7 +315,7 @@ window.addEventListener('pageshow', (e) => {
 });
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js'));
+  window.addEventListener('load', () => void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`));
 }
 
 if (!isMobile()) void showDesktop();
