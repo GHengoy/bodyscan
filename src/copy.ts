@@ -136,6 +136,7 @@ export const UI_TEXT = {
   tagline: '카메라만 켜면 끝. 저장도, 전송도 없는 체형분석',
   privacyClaim: '영상은 저장되지 않고 이 기기 밖으로 나가지 않습니다 · 서버 없음',
   startButton: '측정 시작',
+  guideTitle: '측정 준비',
   guide: [
     '폰을 허리~가슴 높이에 세워 두세요',
     '2~2.5m 뒤로 물러나 전신이 보이게',
@@ -172,7 +173,6 @@ export const UI_TEXT = {
   skeletonOnly: '스켈레톤만 보기',
   voice: '음성 안내',
   adPlaceholder: '광고 자리',
-  productPlaceholder: '어울리는 옷 추천 자리',
 } as const;
 
 export const RESULT_TEXT = {

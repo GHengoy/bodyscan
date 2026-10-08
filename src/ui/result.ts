@@ -134,17 +134,18 @@ export function renderResult(
   root.querySelector<HTMLButtonElement>('#retry-btn')!.onclick = deps.onRetry;
 }
 
-/** 캔버스에 포즈만 그린다(영상 없음). 종횡비를 맞춰 가운데 배치. */
+/** 캔버스에 포즈만 그린다(영상 없음). 종횡비를 유지한 채 균일 배율로 가운데 배치(가로 영상 대응). */
 function drawDiagram(canvas: HTMLCanvasElement, pose: Pose, aspect: number): void {
   const ctx = canvas.getContext('2d')!;
   const H = canvas.height;
-  const W = Math.min(canvas.width, H * aspect);
+  const s = Math.min(canvas.width / aspect, H);
+  const W = s * aspect, H2 = s;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  ctx.translate((canvas.width - W) / 2, 0);
+  ctx.translate((canvas.width - W) / 2, (H - H2) / 2);
   // 미러링: 사용자가 거울처럼 본 모습과 같게
   ctx.translate(W, 0);
   ctx.scale(-1, 1);
-  drawSkeleton(ctx, pose, W, H, { color: '#4ade80', lineWidth: 3, minVisibility: 0.4 });
+  drawSkeleton(ctx, pose, W, H2, { color: '#4ade80', lineWidth: 3, minVisibility: 0.4 });
   ctx.restore();
 }

@@ -28,7 +28,6 @@ export interface CaptureOptions {
  * 조건 유지(hold) → 카운트다운 → 샘플링. 조건이 깨지면 처음으로.
  */
 export class CaptureStage {
-  private readonly holdMs: number;
   private readonly countdownMs: number;
   private readonly hold: HoldTimer;
   private readonly sampler: PoseSampler;
@@ -36,9 +35,8 @@ export class CaptureStage {
   private countdownStart = 0;
 
   constructor(private readonly isOk: (pose: Pose) => boolean, opts: CaptureOptions = {}) {
-    this.holdMs = opts.holdMs ?? 1500;
     this.countdownMs = opts.countdownMs ?? 3000;
-    this.hold = new HoldTimer(this.holdMs);
+    this.hold = new HoldTimer(opts.holdMs ?? 1500);
     this.sampler = new PoseSampler(opts.sampleMs ?? 3000);
   }
 

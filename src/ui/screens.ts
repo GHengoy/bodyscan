@@ -9,7 +9,7 @@ export function startScreen(): string {
       <p class="privacy-claim">🔒 ${UI_TEXT.privacyClaim}</p>
     </header>
     <section class="card guide">
-      <h2>측정 준비</h2>
+      <h2>${UI_TEXT.guideTitle}</h2>
       <ol>${UI_TEXT.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
     </section>
     <button id="start-btn" class="primary">${UI_TEXT.startButton}</button>

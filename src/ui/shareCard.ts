@@ -66,7 +66,9 @@ export function renderShareCard(data: ResultData): HTMLCanvasElement {
   }
 
   // 스켈레톤 도식 (오른쪽)
-  const diagH = 520, diagW = Math.round(diagH * data.aspect);
+  // 가로 영상(aspect > 1)이어도 텍스트 영역을 남기도록 폭을 제한하고, 높이를 맞춰 균일 비율 유지
+  const diagW = Math.min(Math.round(520 * data.aspect), 480);
+  const diagH = Math.round(diagW / data.aspect);
   const dx = W - 72 - diagW, dy = y + 30;
   ctx.fillStyle = '#181b22';
   roundRectPath(ctx, dx, dy, diagW, diagH, 24);
@@ -80,7 +82,7 @@ export function renderShareCard(data: ResultData): HTMLCanvasElement {
   // 항목 요약 (왼쪽) — 주의 이상 우선, 최대 4개
   const sorted = [...data.items].sort((a, b) => b.severity - a.severity).slice(0, 4);
   let iy = dy + 20;
-  const maxTextW = dx - 72 - 30;
+  const maxTextW = Math.max(200, dx - 72 - 30);
   for (const it of sorted) {
     const color = it.grade === 'bad' ? '#f87171' : it.grade === 'warn' ? '#fbbf24' : '#4ade80';
     ctx.fillStyle = color;
