@@ -11,7 +11,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "e2e": "node scripts/e2e-flow.mjs"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.1.0",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@types/qrcode": "^1.5.6",
+    "puppeteer-core": "^25.12.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.7",
     "vitest": "^4.1.11"

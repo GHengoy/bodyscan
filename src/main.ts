@@ -88,6 +88,11 @@ function showError(title: string, body: string, onRetry: () => void): void {
 // ---------- 측정 ----------
 
 function getDetector(): Promise<PoseDetector> {
+  // 개발 모드 E2E 테스트용: scripts/e2e-flow.mjs 가 합성 포즈를 내는 가짜 검출기를 주입한다. 프로덕션 번들에서는 제거됨.
+  if (import.meta.env.DEV) {
+    const fake = (window as unknown as { __bodyscanFakeDetector?: PoseDetector }).__bodyscanFakeDetector;
+    if (fake) return (detectorP ??= Promise.resolve(fake));
+  }
   return (detectorP ??= createDetector().catch((e: unknown) => {
     detectorP = null;
     throw e;

@@ -12,8 +12,11 @@
 npm install
 npm run dev        # 모델/WASM 자동 다운로드 후 https 없이 localhost에서 실행
 npm test           # Vitest 단위 테스트
+npm run e2e        # 카메라·사람 없이 전체 측정 플로우를 끝까지 돌리는 E2E (로컬 크롬 필요)
 npm run build      # dist/ 생성
 ```
+
+- `npm run e2e`는 크롬의 가짜 카메라 장치와 개발 모드 전용 가짜 검출기(합성 포즈)로 시작 → `/?capture=1` → 전신 인식 → 정면 → 측면 → 결과 화면까지 자동으로 진행하고, 인디케이터 0건·카메라 해제·9개 항목 렌더·콘솔 오류 없음을 검사합니다. 스크린샷은 `.e2e/`에 남습니다. 실제 포즈 추정 정확도는 검사하지 않으므로 폰 테스트를 대체하지는 않습니다.
 
 - 서비스 워커 소스는 `src/sw.template.js`이며 빌드 시 `dist/sw.js`로 내보내집니다.
   - 설치 시 앱 셸(`/`, `index.html`, manifest, 아이콘, `products.json`)과 해시 자산만 프리캐시합니다(빌드별 캐시 `bodyscan-<빌드ID>`).
@@ -41,7 +44,7 @@ npm run build      # dist/ 생성
 
 ## 배포
 
-정적 산출물(`dist/`)을 Vercel / Netlify / Cloudflare Pages에 올리면 끝. 빌드 명령 `npm run build`, 출력 `dist`. HTTPS는 자동. 빌드마다 `sw.js`에 새 캐시 이름과 해시 자산 목록이 자동으로 들어가므로 배포 후 사용자는 다음 방문(온라인)에서 새 버전을 받습니다. 수동으로 캐시 이름을 올릴 필요 없습니다.
+정적 산출물(`dist/`)을 Vercel / Netlify / Cloudflare Pages에 올리면 끝. 빌드 명령 `npm run build`, 출력 `dist`. HTTPS는 자동. `vercel.json`과 `netlify.toml`에 빌드 설정과 보안·캐시 헤더(`Permissions-Policy: camera=(self)`, 모델/WASM/해시 자산 1년 캐시, `sw.js` no-cache)가 들어 있어 저장소를 연결하면 그대로 적용됩니다. 빌드마다 `sw.js`에 새 캐시 이름과 해시 자산 목록이 자동으로 들어가므로 배포 후 사용자는 다음 방문(온라인)에서 새 버전을 받습니다. 수동으로 캐시 이름을 올릴 필요 없습니다.
 
 ## 프라이버시 구조
 
