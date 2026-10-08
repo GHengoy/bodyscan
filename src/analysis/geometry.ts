@@ -43,6 +43,18 @@ export function angleAtDeg(a: Vec2, b: Vec2, c: Vec2): number {
   return toDeg(Math.acos(Math.max(-1, Math.min(1, cos))));
 }
 
+/**
+ * 점 p에서 직선 a→b까지의 부호 있는 수직 거리.
+ * 부호 = (b−a)×(p−a)의 반대 방향: a→b가 아래(+y)로 향하는 선이면 p가 +x 쪽일 때 양수.
+ * 퇴화(a=b)면 0.
+ */
+export function signedDistToLine(p: Vec2, a: Vec2, b: Vec2): number {
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const len = Math.hypot(dx, dy);
+  if (len === 0) return 0;
+  return (dy * (p.x - a.x) - dx * (p.y - a.y)) / len;
+}
+
 /** 선 a→b 위에서 y가 주어진 값일 때의 x. 수평선이면 a.x. */
 export function xOnLineAtY(a: Vec2, b: Vec2, y: number): number {
   const dy = b.y - a.y;

@@ -23,19 +23,18 @@ export interface Threshold {
   bad: number;
 }
 
-export const THRESHOLDS: Record<Exclude<PostureItemId, 'kneeAlign'>, Threshold> = {
+export const THRESHOLDS: Record<PostureItemId, Threshold> = {
   shoulderTilt: { warn: 2, bad: 4 },
   hipTilt: { warn: 2, bad: 4 },
   headTilt: { warn: 2, bad: 4 },
   centerDeviation: { warn: 5, bad: 10 },
+  /** 무릎 편차 % (|값| 기준, 부호로 X/O 구분) */
+  kneeAlign: { warn: 3, bad: 6 },
   forwardHead: { warn: 5, bad: 15 },
   roundShoulder: { warn: 5, bad: 12 },
   pelvicTilt: { warn: 5, bad: 10 },
   trunkLean: { warn: 3, bad: 7 },
 };
-
-/** 무릎간격/발목간격: 0.8~1.3 중립, ±0.1~0.15 주의 밴드, 그 밖 불균형 */
-const KNEE = { xBad: 0.7, xWarn: 0.8, oWarn: 1.3, oBad: 1.45 };
 
 export function gradeByThreshold(abs: number, t: Threshold): { grade: Grade; severity: number } {
   if (abs >= t.bad) return { grade: 'bad', severity: (abs - t.bad) / t.bad };
@@ -43,18 +42,12 @@ export function gradeByThreshold(abs: number, t: Threshold): { grade: Grade; sev
   return { grade: 'good', severity: 0 };
 }
 
-function gradeKnee(r: number): { grade: Grade; severity: number; variant: string } {
-  if (r < KNEE.xWarn) {
-    const variant = 'x';
-    if (r < KNEE.xBad) return { grade: 'bad', severity: (KNEE.xBad - r) / KNEE.xBad, variant };
-    return { grade: 'warn', severity: (KNEE.xWarn - r) / KNEE.xWarn, variant };
-  }
-  if (r > KNEE.oWarn) {
-    const variant = 'o';
-    if (r > KNEE.oBad) return { grade: 'bad', severity: (r - KNEE.oBad) / KNEE.oBad, variant };
-    return { grade: 'warn', severity: (r - KNEE.oWarn) / KNEE.oWarn, variant };
-  }
-  return { grade: 'good', severity: 0, variant: 'neutral' };
+/** 무릎 편차: 양수 = X자(안쪽), 음수 = O자(바깥쪽). 양호 범위면 neutral */
+function gradeKnee(pct: number): GradedItem {
+  const abs = Math.abs(pct);
+  const { grade, severity } = gradeByThreshold(abs, THRESHOLDS.kneeAlign);
+  const variant = grade === 'good' ? 'neutral' : pct > 0 ? 'x' : 'o';
+  return { id: 'kneeAlign', grade, value: abs, severity, variant };
 }
 
 function item(id: Exclude<PostureItemId, 'kneeAlign'>, value: number, variant: string): GradedItem {
@@ -65,18 +58,20 @@ function item(id: Exclude<PostureItemId, 'kneeAlign'>, value: number, variant: s
 }
 
 const sideVariant = (s: Side): string => s;
+/** 머리는 높은 귀의 반대쪽(낮은 귀 쪽)으로 기운다 */
+const tiltToward = (higher: Side): string => (higher === 'left' ? 'right' : higher === 'right' ? 'left' : 'even');
 
 export function gradePosture(front: FrontMetrics, side: SideMetrics): GradedItem[] {
-  const knee = gradeKnee(front.kneeAnkleRatio);
   return [
     item('shoulderTilt', front.shoulderTiltDeg, sideVariant(front.shoulderHigher)),
     item('hipTilt', front.hipTiltDeg, sideVariant(front.hipHigher)),
-    item('headTilt', front.headTiltDeg, sideVariant(front.headHigher)),
+    item('headTilt', front.headTiltDeg, tiltToward(front.headHigher)),
     item('centerDeviation', front.centerDeviationPct, ''),
-    { id: 'kneeAlign', grade: knee.grade, value: front.kneeAnkleRatio, severity: knee.severity, variant: knee.variant },
+    gradeKnee(front.kneeDeviationPct),
     item('forwardHead', side.forwardHeadDeg, ''),
     item('roundShoulder', side.roundShoulderPct, ''),
-    item('pelvicTilt', side.pelvicShiftDeg, side.pelvicShiftDeg >= 0 ? 'anterior' : 'posterior'),
+    // 고관절이 어깨–무릎 선보다 앞(+) = 스웨이백 패턴 = 후방경사 경향
+    item('pelvicTilt', side.pelvicShiftDeg, side.pelvicShiftDeg >= 0 ? 'posterior' : 'anterior'),
     item('trunkLean', side.trunkLeanDeg, side.trunkLeanDeg >= 0 ? 'forward' : 'backward'),
   ];
 }

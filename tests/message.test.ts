@@ -13,10 +13,15 @@ describe('postureMessage', () => {
     expect(m).toContain('왼쪽');
     expect(m).not.toContain('{');
   });
-  it('fills ratio and variant label for knees', () => {
-    const m = postureMessage(g({ id: 'kneeAlign', grade: 'bad', value: 1.523, variant: 'o' }));
-    expect(m).toContain('1.52');
+  it('fills pct and variant label for knees', () => {
+    const m = postureMessage(g({ id: 'kneeAlign', grade: 'bad', value: 7.81, variant: 'o' }));
+    expect(m).toContain('무릎 편차 7.8%');
     expect(m).toContain('카우보이');
+    expect(m).not.toContain('{');
+  });
+  it('head tilt message names the side the head tilts toward', () => {
+    const m = postureMessage(g({ id: 'headTilt', grade: 'warn', value: 3, variant: 'right' }));
+    expect(m).toContain('오른쪽으로 3.0° 기울었어요');
     expect(m).not.toContain('{');
   });
   it('fills pct for round shoulder', () => {

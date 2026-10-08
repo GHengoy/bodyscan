@@ -1,5 +1,5 @@
 import { LM, type Pose } from '../pose/landmarks';
-import { toPlane, dist, mid, lineTiltDeg, type Vec2 } from './geometry';
+import { toPlane, dist, mid, lineTiltDeg, signedDistToLine, type Vec2 } from './geometry';
 
 export type Side = 'left' | 'right' | 'even';
 
@@ -13,8 +13,11 @@ export interface FrontMetrics {
   headHigher: Side;
   /** 코·어깨중점·골반중점·발목중점 x 최대 편차 / 어깨 너비 × 100 */
   centerDeviationPct: number;
-  /** 무릎 간격 / 발목 간격 */
-  kneeAnkleRatio: number;
+  /**
+   * 무릎이 고관절→발목 선에서 벗어난 부호 있는 거리(양 다리 평균) / 평균 다리 길이 × 100.
+   * 양수 = 몸 중심선 쪽(X자 경향), 음수 = 바깥쪽(O자 경향)
+   */
+  kneeDeviationPct: number;
 }
 
 const EVEN_DEG = 0.5;
@@ -42,8 +45,12 @@ export function analyzeFront(pose: Pose, aspect: number): FrontMetrics {
   const xs = [nose.x, mid(ls, rs).x, mid(lh, rh).x, mid(la, ra).x];
   const centerDeviationPct = ((Math.max(...xs) - Math.min(...xs)) / shoulderWidth) * 100;
 
-  const ankleGap = dist(la, ra) || 1e-6;
-  const kneeAnkleRatio = dist(lk, rk) / ankleGap;
+  // 다리별: 고관절→발목 선에서 무릎까지의 수직 거리, 몸 중심선(골반 중점) 쪽이면 양수
+  const hipMidX = mid(lh, rh).x;
+  const inward = (hip: Vec2, knee: Vec2, ankle: Vec2) =>
+    signedDistToLine(knee, hip, ankle) * (Math.sign(hipMidX - hip.x) || 1);
+  const legLen = (dist(lh, la) + dist(rh, ra)) / 2 || 1e-6;
+  const kneeDeviationPct = ((inward(lh, lk, la) + inward(rh, rk, ra)) / 2 / legLen) * 100;
 
   return {
     shoulderTiltDeg,
@@ -53,6 +60,6 @@ export function analyzeFront(pose: Pose, aspect: number): FrontMetrics {
     headTiltDeg,
     headHigher: higher(le, re, headTiltDeg),
     centerDeviationPct,
-    kneeAnkleRatio,
+    kneeDeviationPct,
   };
 }

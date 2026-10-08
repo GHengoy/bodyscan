@@ -8,7 +8,7 @@ export interface SideMetrics {
   forwardHeadDeg: number;
   /** 어깨가 귀–고관절 선보다 앞으로 나간 정도(몸통 길이 대비 %) */
   roundShoulderPct: number;
-  /** 180 − ∠(어깨–고관절–무릎). 고관절이 앞이면 +(전방경사 경향), 뒤면 − */
+  /** 180 − ∠(어깨–고관절–무릎). 고관절이 앞이면 +(스웨이백·후방경사 경향), 뒤면 −(전방경사 경향) */
   pelvicShiftDeg: number;
   /** 고관절→어깨가 수직에서 앞으로 기운 각도. 양수 = 앞으로 */
   trunkLeanDeg: number;
@@ -25,8 +25,8 @@ export function analyzeSide(pose: Pose, aspect: number): SideMetrics {
   const ear = P(idx.ear), shoulder = P(idx.shoulder), hip = P(idx.hip), knee = P(idx.knee);
   const nose = P(LM.NOSE);
 
-  // 이미지 좌표에서 사람이 바라보는 방향(+1 = +x). 코가 어깨보다 앞에 있다.
-  const fwd = Math.sign(nose.x - shoulder.x) || 1;
+  // 이미지 좌표에서 사람이 바라보는 방향(+1 = +x). 코는 귀보다 앞에 있다(둘 다 머리 위라 상체 기울기에 영향받지 않음).
+  const fwd = Math.sign(nose.x - ear.x) || 1;
   const torso = dist(shoulder, hip) || 1e-6;
 
   const forwardHeadDeg = angleFromVerticalDeg(shoulder, ear) * fwd;

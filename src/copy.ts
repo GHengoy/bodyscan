@@ -51,9 +51,9 @@ export const POSTURE_COPY: Record<PostureItemId, ItemCopy> = {
   },
   kneeAlign: {
     title: '다리 정렬',
-    good: '나란히 선 젓가락 🥢 (무릎/발목 간격 {ratio})',
-    warn: '{variantLabel}이 살짝 보여요 (무릎/발목 간격 {ratio})',
-    bad: '{variantLabel} (무릎/발목 간격 {ratio})',
+    good: '나란히 선 젓가락 🥢 (무릎 편차 {pct}%)',
+    warn: '{variantLabel}이 살짝 보여요 (무릎 편차 {pct}%)',
+    bad: '{variantLabel} (무릎 편차 {pct}%)',
     tip: 'O자 경향이면 허벅지 안쪽, X자 경향이면 엉덩이 바깥 근육 강화 운동이 도움이 돼요',
   },
   forwardHead: {
@@ -103,7 +103,6 @@ export function postureMessage(item: GradedItem): string {
   return fillTemplate(c[item.grade], {
     deg: item.value.toFixed(1),
     pct: item.value.toFixed(1),
-    ratio: item.value.toFixed(2),
     side: sideLabel(item.variant),
     variantLabel: VARIANT_LABEL[item.variant] ?? '',
   });
@@ -115,7 +114,7 @@ export const HEADLINES: Record<string, { title: string; sub: string }> = {
   hipTilt: { title: '피사의 사탑이시군요 🗼', sub: '골반이 한쪽으로 기울어 있어요.' },
   headTilt: { title: '피사의 사탑이시군요 🗼', sub: '머리가 한쪽으로 기울어 있어요.' },
   centerDeviation: { title: '바람 맞은 갈대시군요 🌾', sub: '몸의 중심선이 한쪽으로 흔들려 있어요.' },
-  kneeAlign: { title: '다리 정렬을 확인해 보세요 🦵', sub: '무릎 간격이 발목 간격과 많이 달라요.' },
+  kneeAlign: { title: '다리 정렬을 확인해 보세요 🦵', sub: '무릎이 엉덩이–발목 선에서 많이 벗어나 있어요.' },
   'kneeAlign.o': { title: '카우보이 다리시군요 🤠', sub: '무릎이 바깥으로 벌어진 O자 경향이에요.' },
   'kneeAlign.x': { title: '펭귄 다리시군요 🐧', sub: '무릎이 안쪽으로 모이는 X자 경향이에요.' },
   forwardHead: { title: '당신은 거북이시군요 🐢', sub: '머리가 어깨보다 앞으로 나와 있어요.' },
@@ -137,7 +136,12 @@ export const UI_TEXT = {
   tagline: '카메라만 켜면 끝. 저장도, 전송도 없는 체형분석',
   privacyClaim: '영상은 저장되지 않고 이 기기 밖으로 나가지 않습니다 · 서버 없음',
   startButton: '측정 시작',
-  guide: ['폰을 허리~가슴 높이에 세워 두세요', '2~2.5m 뒤로 물러나 전신이 보이게', '밝은 곳, 몸에 붙는 옷이 정확해요'],
+  guide: [
+    '폰을 허리~가슴 높이에 세워 두세요',
+    '2~2.5m 뒤로 물러나 전신이 보이게',
+    '밝은 곳, 몸에 붙는 옷이 정확해요',
+    '발은 골반 너비로 벌리고 팔은 자연스럽게 내려 주세요',
+  ],
   loadingModel: '분석 엔진 준비 중…',
   privacyOk: '📵 네트워크 전송 0건 · 영상은 이 기기 밖으로 나가지 않습니다',
   privacyBad: (n: number) => `⚠️ 네트워크 요청 ${n}건 감지`,

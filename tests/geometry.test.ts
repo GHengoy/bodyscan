@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  toPlane, dist, mid, lineTiltDeg, angleFromVerticalDeg, angleAtDeg, xOnLineAtY,
+  toPlane, dist, mid, lineTiltDeg, angleFromVerticalDeg, angleAtDeg, xOnLineAtY, signedDistToLine,
 } from '../src/analysis/geometry';
 
 describe('geometry', () => {
@@ -36,5 +36,17 @@ describe('geometry', () => {
     expect(xOnLineAtY({ x: 0, y: 0 }, { x: 2, y: 2 }, 1)).toBeCloseTo(1);
     expect(xOnLineAtY({ x: 1, y: 0 }, { x: 1, y: 5 }, 3)).toBeCloseTo(1);
     expect(xOnLineAtY({ x: 1, y: 2 }, { x: 4, y: 2 }, 2)).toBeCloseTo(1); // 수평선: a.x 반환
+  });
+
+  it('signedDistToLine: perpendicular distance, +x side of a downward line is positive', () => {
+    const a = { x: 0, y: 0 }, b = { x: 0, y: 2 };
+    expect(signedDistToLine({ x: 1, y: 1 }, a, b)).toBeCloseTo(1);
+    expect(signedDistToLine({ x: -0.5, y: 5 }, a, b)).toBeCloseTo(-0.5);
+    expect(signedDistToLine({ x: 0, y: 1 }, a, b)).toBeCloseTo(0);
+    // 대각선 y=x 위쪽 방향에서 (1,0)까지: √2/2
+    expect(Math.abs(signedDistToLine({ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 1 }))).toBeCloseTo(Math.SQRT1_2);
+    // 방향을 뒤집으면 부호도 뒤집힌다
+    expect(signedDistToLine({ x: 1, y: 1 }, b, a)).toBeCloseTo(-1);
+    expect(signedDistToLine({ x: 1, y: 1 }, a, a)).toBe(0); // 퇴화
   });
 });

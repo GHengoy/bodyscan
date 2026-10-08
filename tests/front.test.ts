@@ -11,7 +11,10 @@ describe('analyzeFront', () => {
     expect(m.hipTiltDeg).toBeCloseTo(0);
     expect(m.headTiltDeg).toBeCloseTo(0);
     expect(m.centerDeviationPct).toBeCloseTo(0);
-    expect(m.kneeAnkleRatio).toBeCloseTo(0.16 / 0.14, 2);
+    // 왼다리: 고관절 (0.61,0.52) → 발목 (0.57,0.9), 무릎 (0.58,0.71)
+    // 수직 거리 = |0.38·(−0.03) + 0.04·0.19| / √(0.04²+0.38²) = 0.0038/0.38210 = 0.009945 (안쪽)
+    // ÷ 다리 길이 0.38210 × 100 ≈ 2.603%
+    expect(m.kneeDeviationPct).toBeCloseTo(2.603, 2);
   });
 
   it('left shoulder raised → tilt and higher=left', () => {
@@ -46,11 +49,28 @@ describe('analyzeFront', () => {
     expect(m.centerDeviationPct).toBeCloseTo(10, 1);
   });
 
-  it('knees close together → low knee/ankle ratio', () => {
+  it('knees moved inward 0.04 → large positive deviation (X)', () => {
     const p = standingFront();
-    p[LM.LEFT_KNEE].x = 0.52;
-    p[LM.RIGHT_KNEE].x = 0.48;
-    expect(analyzeFront(p, 1).kneeAnkleRatio).toBeCloseTo(0.04 / 0.14, 2);
+    p[LM.LEFT_KNEE].x = 0.54;
+    p[LM.RIGHT_KNEE].x = 0.46;
+    // (0.38·0.07 − 0.04·0.19)/0.38210 = 0.04973 → /0.38210 ×100 ≈ 13.01%
+    expect(analyzeFront(p, 1).kneeDeviationPct).toBeCloseTo(13.01, 1);
+  });
+
+  it('knees moved outward 0.04 → negative deviation (O)', () => {
+    const p = standingFront();
+    p[LM.LEFT_KNEE].x = 0.62;
+    p[LM.RIGHT_KNEE].x = 0.38;
+    // −(0.38·0.01 + 0.04·0.19)/0.38210 = −0.02984 → ≈ −7.81%
+    expect(analyzeFront(p, 1).kneeDeviationPct).toBeCloseTo(-7.81, 1);
+  });
+
+  it('knee deviation is independent of stance width when legs are straight', () => {
+    const p = standingFront();
+    // 다리를 넓게 벌려도 무릎이 고관절–발목 직선 위에 있으면 0
+    p[LM.LEFT_ANKLE].x = 0.75; p[LM.RIGHT_ANKLE].x = 0.25;
+    p[LM.LEFT_KNEE].x = 0.68; p[LM.RIGHT_KNEE].x = 0.32;
+    expect(analyzeFront(p, 1).kneeDeviationPct).toBeCloseTo(0, 5);
   });
 
   it('aspect correction changes tilt angles', () => {
