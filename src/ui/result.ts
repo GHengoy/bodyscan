@@ -9,8 +9,9 @@ import { mountBanner, AD_SLOTS } from '../ads/banner';
 import { drawSkeleton } from './overlay';
 import { renderShareCard, shareResult, canShareFiles } from './shareCard';
 import {
-  UI_TEXT, RESULT_TEXT, POSTURE_COPY, SHAPE_COPY, headlineCopy, postureMessage, type StyleAdvice,
+  UI_TEXT, RESULT_TEXT, POSTURE_COPY, SHAPE_COPY, headlineCopy, postureMessage, fillTemplate, type StyleAdvice,
 } from '../copy';
+import { siteUrl } from '../site';
 
 export interface ResultData {
   front: FrontMetrics;
@@ -43,7 +44,7 @@ function productHtml(p: Product | null, cat: ProductCategory): string {
   if (!p || !/^https?:\/\//i.test(p.url)) return `<div class="ad-slot" data-slot="native-${cat}"></div>`;
   const thumb = p.image ? `<img src="${esc(p.image)}" alt="" loading="lazy" />` : RESULT_TEXT.categoryEmoji[cat];
   return `
-  <a class="product" href="${esc(p.url)}" target="_blank" rel="noopener sponsored">
+  <a class="product" href="${esc(p.url)}" target="_blank" rel="noopener sponsored" data-category="${cat}">
     <div class="thumb">${thumb}</div>
     <div>
       <div class="name">${esc(p.name)}</div>
@@ -56,7 +57,12 @@ function productHtml(p: Product | null, cat: ProductCategory): string {
 export function renderResult(
   root: HTMLElement,
   data: ResultData,
-  deps: { products: Product[]; onRetry: () => void },
+  deps: {
+    products: Product[];
+    onRetry: () => void;
+    onShare?: (result: string) => void;
+    onProductClick?: (category: string) => void;
+  },
 ): void {
   const h = headlineCopy(data.headline);
   const attention = data.items.filter((i) => i.grade !== 'good').length;
@@ -105,6 +111,8 @@ export function renderResult(
     <p class="fineprint">${UI_TEXT.disclaimer}</p>
     <div class="actions">
       <button id="share-btn" class="primary">${UI_TEXT.share}</button>
+      <p class="fineprint center">${RESULT_TEXT.shareHint}</p>
+      <button id="copy-btn" class="secondary">${RESULT_TEXT.copyLink}</button>
       <button id="retry-btn" class="secondary">${UI_TEXT.retry}</button>
     </div>
     <div class="ad-slot" data-slot="result2"></div>
@@ -125,12 +133,27 @@ export function renderResult(
     shareBtn.onclick = async () => {
       shareBtn.disabled = true;
       try {
-        await shareResult(renderShareCard(data));
+        const r = await shareResult(renderShareCard(data), h.title);
+        deps.onShare?.(r);
       } finally {
         shareBtn.disabled = false;
       }
     };
   }
+  // 공유 시트가 없는 환경(데스크톱 등)에서도 링크를 퍼뜨릴 수 있게
+  const copyBtn = root.querySelector<HTMLButtonElement>('#copy-btn')!;
+  copyBtn.onclick = async () => {
+    const text = `${fillTemplate(RESULT_TEXT.shareText, { title: h.title })} ${siteUrl()}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = RESULT_TEXT.copied;
+      deps.onShare?.('copied');
+      setTimeout(() => (copyBtn.textContent = RESULT_TEXT.copyLink), 2000);
+    } catch { /* 클립보드 미지원: 버튼 그대로 */ }
+  };
+  root.querySelectorAll<HTMLAnchorElement>('a.product').forEach((a) => {
+    a.addEventListener('click', () => deps.onProductClick?.(a.dataset.category ?? ''));
+  });
   root.querySelector<HTMLButtonElement>('#retry-btn')!.onclick = deps.onRetry;
 }
 

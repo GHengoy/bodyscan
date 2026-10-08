@@ -1,7 +1,8 @@
 import type { ResultData } from './result';
-import { headlineCopy, SHAPE_COPY, POSTURE_COPY, postureMessage, UI_TEXT, RESULT_TEXT } from '../copy';
+import { headlineCopy, SHAPE_COPY, POSTURE_COPY, postureMessage, fillTemplate, UI_TEXT, RESULT_TEXT } from '../copy';
 import { drawSkeleton } from './overlay';
 import type { ProductCategory } from '../ads/products';
+import { siteUrl, siteHost } from '../site';
 
 const W = 1080;
 const PAD = 72;
@@ -190,6 +191,8 @@ function layout(ctx: CanvasRenderingContext2D, data: ResultData, draw: boolean):
   para(UI_TEXT.disclaimer, `400 22px ${FONT}`, C.muted, 30);
   y += 44;
   text(RESULT_TEXT.shareCardFooter, `500 24px ${FONT}`, C.accent);
+  y += 40;
+  text(fillTemplate(RESULT_TEXT.shareCardCta, { host: siteHost() }), `700 28px ${FONT}`, C.text);
   return y + PAD;
 }
 
@@ -222,13 +225,15 @@ export function canShareFiles(): boolean {
   }
 }
 
-export async function shareResult(canvas: HTMLCanvasElement): Promise<'shared' | 'unsupported' | 'cancelled' | 'failed'> {
+/** 카드 PNG + 테스트 링크를 함께 공유한다(받는 사람이 바로 들어올 수 있게) */
+export async function shareResult(canvas: HTMLCanvasElement, headlineTitle: string): Promise<'shared' | 'unsupported' | 'cancelled' | 'failed'> {
   if (!canShareFiles()) return 'unsupported';
   const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/png'));
   if (!blob) return 'failed';
   const file = new File([blob], 'bodyscan-result.png', { type: 'image/png' });
+  const text = fillTemplate(RESULT_TEXT.shareText, { title: headlineTitle });
   try {
-    await navigator.share({ files: [file], title: RESULT_TEXT.shareTitle, text: RESULT_TEXT.shareText });
+    await navigator.share({ files: [file], title: RESULT_TEXT.shareTitle, text: `${text} ${siteUrl()}`, url: siteUrl() });
     return 'shared';
   } catch (e) {
     return (e as DOMException)?.name === 'AbortError' ? 'cancelled' : 'failed';

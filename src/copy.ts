@@ -134,6 +134,13 @@ export function headlineCopy(h: Headline): { title: string; sub: string } {
 export const UI_TEXT = {
   appName: 'BodyScan',
   tagline: '카메라만 켜면 끝. 저장도, 전송도 없는 체형분석',
+  /** 시작 화면 하단 FAQ(검색 노출·신뢰용) */
+  faq: [
+    ['무엇을 알려주나요?', '거북목, 라운드숄더, 어깨·골반 높이 차, 골반 경사, 다리 정렬 같은 자세 항목과 어깨:골반·상하체 비율을 "당신은 거북이시군요 🐢"처럼 한 줄로, 그리고 체형에 어울리는 옷 스타일을 알려줘요.'],
+    ['정말 영상이 저장되지 않나요?', '네. 분석은 폰 안에서만 돌아가고 서버가 없어요. 측정 중 화면 위에 네트워크 요청 수가 0건인 걸 보여주고, 끝나면 카메라가 바로 꺼집니다. 결과도 새로고침하면 사라져요.'],
+    ['얼마나 걸리나요?', '전신이 보이게 서면 정면 3초, 옆으로 돌아 3초 — 안내 포함 30초 정도예요.'],
+    ['정확한가요?', '폰 카메라 하나로 추정하는 참고용 결과예요. 의료 진단이 아니며, 밝은 곳에서 몸에 붙는 옷을 입고 2~2.5m 떨어져 서면 가장 잘 나와요.'],
+  ] as ReadonlyArray<readonly [string, string]>,
   privacyClaim: '영상은 저장되지 않고 이 기기 밖으로 나가지 않습니다 · 서버 없음',
   startButton: '측정 시작',
   guideTitle: '측정 준비',
@@ -192,8 +199,14 @@ export const RESULT_TEXT = {
   diagramSide: '측면',
   shareCardTagline: '저장 없는 실시간 체형분석',
   shareCardFooter: '📵 영상은 저장되지 않았습니다 · 결과 수치만 담긴 카드입니다',
+  /** 카드 맨 아래 워터마크. {host}에 사이트 주소가 들어간다 — 카드를 본 사람이 들어오는 입구 */
+  shareCardCta: '👉 나도 30초 체형 테스트: {host}',
   shareTitle: 'BodyScan 결과',
-  shareText: '저장 없는 실시간 체형분석 결과',
+  /** 공유 시트 본문. {title}에 캐릭터 타이틀 — 링크(url)는 별도로 붙는다 */
+  shareText: '내 체형 테스트 결과: {title} — 30초면 끝, 영상 저장 없음. 너도 해봐!',
+  copyLink: '링크 복사',
+  copied: '복사됐어요 ✓',
+  shareHint: '공유하면 결과 카드와 함께 테스트 링크가 전달돼요',
 } as const;
 
 export interface StyleAdvice {

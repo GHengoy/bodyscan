@@ -19,6 +19,7 @@ import { renderQr } from './ui/qr';
 import { speak, setVoiceEnabled, isVoiceEnabled } from './speech';
 import { renderResult, type ResultData } from './ui/result';
 import { renderShareCard } from './ui/shareCard';
+import { enableAnalytics, track } from './analytics';
 
 type Phase = 'setup' | 'front' | 'side';
 
@@ -61,6 +62,7 @@ function captureUrl(): string {
 
 function showStart(): void {
   setAdsAllowed(true); // 시작 화면 문서에서는 카메라를 켜지 않는다
+  enableAnalytics();
   app.innerHTML = startScreen();
   mountBanner($('[data-slot="start"]'), AD_SLOTS.start);
   $('#start-btn').onclick = (e) => {
@@ -283,7 +285,12 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
     style: recommendStyle(proportion),
     frontPose, sidePose, aspect,
   };
-  renderResult(app, data, { products, onRetry: () => location.assign(captureUrl()) });
+  renderResult(app, data, {
+    products,
+    onRetry: () => location.assign(captureUrl()),
+    onShare: (r) => track('share', { method: r }),
+    onProductClick: (category) => track('product_click', { category }),
+  });
   window.scrollTo(0, 0);
   if (import.meta.env.DEV) {
     // E2E가 공유 카드 PNG를 뽑아 볼 수 있게 노출(프로덕션 번들에서는 제거됨)
@@ -291,6 +298,8 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
   }
   // 카메라가 꺼졌고 렌더까지 끝난 뒤에만 허용 — 도중에 예외가 나면 광고는 꺼진 채로 문서 내 재시도 가능
   setAdsAllowed(true);
+  enableAnalytics(); // 광고와 같은 규칙: 카메라가 끝난 뒤에만
+  track('measure_complete', { headline: data.headline.id, variant: data.headline.variant });
   // 허용 이후 결과 화면의 광고 슬롯을 실제 광고로 다시 마운트
   for (const el of app.querySelectorAll<HTMLElement>('.ad-slot')) {
     const s = el.dataset.slot ?? '';

@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "node scripts/e2e-flow.mjs",
-    "deploy": "node scripts/deploy-pages.mjs"
+    "deploy": "node scripts/deploy-pages.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.1.0",

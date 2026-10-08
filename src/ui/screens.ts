@@ -15,6 +15,9 @@ export function startScreen(): string {
     <button id="start-btn" class="primary">${UI_TEXT.startButton}</button>
     <p class="fineprint">${UI_TEXT.disclaimer}</p>
     <div class="ad-slot" data-slot="start"></div>
+    <section class="faq">
+      ${UI_TEXT.faq.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}
+    </section>
   </main>`;
 }
 

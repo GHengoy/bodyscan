@@ -28,7 +28,13 @@ npm run build      # dist/ 생성
 
 ## 환경 변수 (`.env`)
 
-`.env.example` 참고. `VITE_ADSENSE_CLIENT`가 비어 있으면 광고 자리에 플레이스홀더만 표시됩니다.
+`.env.example` 참고. `VITE_ADSENSE_CLIENT`가 비어 있으면 광고 자리에 플레이스홀더만 표시됩니다. `VITE_GA_ID`(GA4 측정 ID)를 넣으면 시작·결과 화면에서만 방문 통계와 `measure_complete`/`share`/`product_click` 이벤트를 보냅니다(카메라가 켜지는 문서에서는 로드되지 않음).
+
+## 사용자 유입
+
+- 결과 공유가 핵심 유입 경로입니다: 공유 시트에 카드 PNG + 링크 + 문구가 함께 나가고, 카드 하단에 사이트 주소 워터마크가 들어갑니다. 데스크톱에서는 "링크 복사" 버튼.
+- 검색·소셜 노출: `index.html`의 제목/설명/OG 태그(`public/og.png`는 `npm run og`로 재생성), `sitemap.xml`·`robots.txt`는 빌드 시 생성, 시작 화면 FAQ.
+- 채널별 실행 플랜과 복붙용 글/광고 카피: [docs/marketing/launch-plan.md](docs/marketing/launch-plan.md)
 
 ## 제휴 상품
 
