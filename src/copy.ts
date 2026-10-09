@@ -195,6 +195,8 @@ export const RESULT_TEXT = {
   styleTitle: '어울리는 스타일 👗',
   avoidLabel: '🚫 피하면 좋은 것',
   productCta: '어울리는 옷 보기 →',
+  /** 쿠팡 파트너스 의무 고지 문구(상품 링크가 있는 화면에 반드시 표시) */
+  affiliateDisclosure: '이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.',
   diagramFront: '정면',
   diagramSide: '측면',
   shareCardTagline: '저장 없는 실시간 체형분석',

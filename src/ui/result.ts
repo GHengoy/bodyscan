@@ -103,6 +103,7 @@ export function renderResult(
           </div>`).join('')}
         <div class="style-item"><div class="k">${RESULT_TEXT.avoidLabel}</div><div>${data.style.avoid}</div></div>
       </div>
+      <p class="fineprint">${RESULT_TEXT.affiliateDisclosure}</p>
     </section>
     <section class="diagrams">
       <figure><canvas id="diag-front" width="180" height="320"></canvas><figcaption>${RESULT_TEXT.diagramFront}</figcaption></figure>
