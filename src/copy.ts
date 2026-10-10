@@ -146,7 +146,7 @@ export const UI_TEXT = {
   guideTitle: '측정 준비',
   guide: [
     '폰을 허리~가슴 높이에 세워 두세요',
-    '2~2.5m 뒤로 물러나 전신이 보이게',
+    '2~2.5m 뒤로 물러나 전신이 보이게 (후면 카메라로 전환하면 더 가까워도 OK)',
     '밝은 곳, 몸에 붙는 옷이 정확해요',
     '발은 골반 너비로 벌리고 팔은 자연스럽게 내려 주세요',
   ],
@@ -179,6 +179,9 @@ export const UI_TEXT = {
   desktopBody: '전면 카메라로 전신을 찍어야 해서 폰에서 가장 잘 동작해요. QR을 스캔하세요.',
   skeletonOnly: '스켈레톤만 보기',
   voice: '음성 안내',
+  switchToBack: '🔄 후면 카메라로',
+  switchToFront: '🔄 전면 카메라로',
+  backCameraTip: '후면 카메라는 화각이 넓어 더 가까이서도 전신이 들어와요. 누가 찍어주거나 음성 안내를 들으며 측정하세요.',
   adPlaceholder: '광고 자리',
 } as const;
 

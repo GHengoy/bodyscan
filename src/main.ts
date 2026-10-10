@@ -1,6 +1,6 @@
 import './style.css';
 import { UI_TEXT } from './copy';
-import { openCamera, closeCamera, CameraError } from './camera';
+import { openCamera, closeCamera, CameraError, type Facing } from './camera';
 import { createDetector, type PoseDetector } from './pose/detector';
 import { fullBodyVisible, isFacingFront, isFacingSide, HoldTimer } from './pose/gating';
 import { CaptureStage } from './pose/capture';
@@ -52,10 +52,15 @@ function isMobile(): boolean {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1;
 }
 
-/** 측정 문서 URL. 개발용 desktop=1 오버라이드는 유지한다. */
-function captureUrl(): string {
-  const base = import.meta.env.BASE_URL; // '/' 또는 '/bodyscan/'
-  return params.get('desktop') === '1' ? `${base}?capture=1&desktop=1` : `${base}?capture=1`;
+/** 이번 문서의 카메라 방향. URL 파라미터로만 기억한다(저장소 사용 금지). */
+const FACING: Facing = params.get('cam') === 'back' ? 'environment' : 'user';
+
+/** 측정 문서 URL. 개발용 desktop=1 오버라이드와 카메라 방향은 유지한다. */
+function captureUrl(facing: Facing = FACING): string {
+  const q = new URLSearchParams({ capture: '1' });
+  if (params.get('desktop') === '1') q.set('desktop', '1');
+  if (facing === 'environment') q.set('cam', 'back');
+  return `${import.meta.env.BASE_URL}?${q.toString()}`;
 }
 
 // ---------- 화면 ----------
@@ -135,11 +140,27 @@ async function runCapture(): Promise<void> {
   voiceToggle.checked = isVoiceEnabled();
   voiceToggle.onchange = () => setVoiceEnabled(voiceToggle.checked);
 
+  // 전/후면 전환은 새 측정 문서로 이동(카메라·단계 상태를 깨끗이 다시 시작)
+  const mirrored = FACING === 'user';
+  $('.cam-stage').classList.toggle('no-mirror', !mirrored);
+  const camToggle = $<HTMLButtonElement>('#toggle-camera');
+  camToggle.textContent = mirrored ? UI_TEXT.switchToBack : UI_TEXT.switchToFront;
+  camToggle.onclick = () => {
+    stopCapture();
+    location.assign(captureUrl(mirrored ? 'environment' : 'user'));
+  };
+  if (!mirrored) {
+    const tip = document.createElement('div');
+    tip.className = 'cam-tip';
+    tip.textContent = UI_TEXT.backCameraTip;
+    $('.cam-wrap').appendChild(tip);
+  }
+
   const privacyEl = $('#privacy');
   statusEl.textContent = UI_TEXT.cameraStarting;
   privacyEl.textContent = UI_TEXT.cameraStarting;
   try {
-    await openCamera(video);
+    await openCamera(video, FACING);
   } catch (e) {
     const denied = e instanceof CameraError && e.code === 'denied';
     if (myRun !== runId) return;
@@ -284,6 +305,7 @@ function finish(frontPose: Pose, sidePose: Pose, aspect: number): void {
     headline: pickHeadline(items),
     style: recommendStyle(proportion),
     frontPose, sidePose, aspect,
+    mirrored: FACING === 'user',
   };
   renderResult(app, data, {
     products,

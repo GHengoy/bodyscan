@@ -87,3 +87,9 @@ button:disabled { opacity: 0.5; }
 .faq details[open] summary::after { content: '−'; }
 .faq p { margin-top: 8px; font-size: 0.9rem; color: var(--muted); }
 .fineprint.center { text-align: center; }
+
+/* 후면 카메라: 거울 반전 없음 */
+.cam-stage.no-mirror { transform: none; }
+.cam-controls { flex-wrap: wrap; }
+.cam-controls button.link { appearance: none; background: none; border: 1px solid #343a46; border-radius: 999px; color: var(--text); padding: 4px 12px; font-size: 0.85rem; cursor: pointer; }
+.cam-tip { position: absolute; left: 16px; right: 16px; top: 12px; text-align: center; font-size: 0.8rem; color: #e5e7eb; background: rgba(0,0,0,0.45); border-radius: 10px; padding: 6px 10px; pointer-events: none; }

@@ -23,6 +23,8 @@ export interface ResultData {
   frontPose: Pose;
   sidePose: Pose;
   aspect: number;
+  /** 전면 카메라(거울 보기)로 찍었으면 true → 도식도 거울처럼 그린다 */
+  mirrored: boolean;
 }
 
 function esc(s: string): string {
@@ -119,8 +121,8 @@ export function renderResult(
     <div class="ad-slot" data-slot="result2"></div>
   </main>`;
 
-  drawDiagram(root.querySelector<HTMLCanvasElement>('#diag-front')!, data.frontPose, data.aspect);
-  drawDiagram(root.querySelector<HTMLCanvasElement>('#diag-side')!, data.sidePose, data.aspect);
+  drawDiagram(root.querySelector<HTMLCanvasElement>('#diag-front')!, data.frontPose, data.aspect, data.mirrored);
+  drawDiagram(root.querySelector<HTMLCanvasElement>('#diag-side')!, data.sidePose, data.aspect, data.mirrored);
 
   mountBanner(root.querySelector('[data-slot="result1"]')!, AD_SLOTS.result1);
   mountBanner(root.querySelector('[data-slot="result2"]')!, AD_SLOTS.result2);
@@ -159,7 +161,7 @@ export function renderResult(
 }
 
 /** 캔버스에 포즈만 그린다(영상 없음). 종횡비를 유지한 채 균일 배율로 가운데 배치(가로 영상 대응). */
-function drawDiagram(canvas: HTMLCanvasElement, pose: Pose, aspect: number): void {
+function drawDiagram(canvas: HTMLCanvasElement, pose: Pose, aspect: number, mirrored: boolean): void {
   const ctx = canvas.getContext('2d')!;
   const H = canvas.height;
   const s = Math.min(canvas.width / aspect, H);
@@ -167,9 +169,11 @@ function drawDiagram(canvas: HTMLCanvasElement, pose: Pose, aspect: number): voi
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.translate((canvas.width - W) / 2, (H - H2) / 2);
-  // 미러링: 사용자가 거울처럼 본 모습과 같게
-  ctx.translate(W, 0);
-  ctx.scale(-1, 1);
+  // 전면 카메라면 사용자가 거울처럼 본 모습과 같게 반전, 후면이면 그대로
+  if (mirrored) {
+    ctx.translate(W, 0);
+    ctx.scale(-1, 1);
+  }
   drawSkeleton(ctx, pose, W, H2, { color: '#4ade80', lineWidth: 3, minVisibility: 0.4 });
   ctx.restore();
 }

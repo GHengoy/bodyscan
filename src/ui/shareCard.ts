@@ -116,8 +116,11 @@ function layout(ctx: CanvasRenderingContext2D, data: ResultData, draw: boolean):
       roundRectPath(ctx, x, y, diagW, diagH, 24);
       ctx.fill();
       ctx.save();
-      ctx.translate(x + diagW, y); // 미러링: 화면과 동일
-      ctx.scale(-1, 1);
+      ctx.translate(x, y);
+      if (data.mirrored) { // 전면 카메라: 화면과 같은 거울 보기
+        ctx.translate(diagW, 0);
+        ctx.scale(-1, 1);
+      }
       drawSkeleton(ctx, pose, diagW, diagH, { color: C.accent, lineWidth: 5, minVisibility: 0.4 });
       ctx.restore();
       ctx.fillStyle = C.muted;

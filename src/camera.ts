@@ -7,14 +7,19 @@ export class CameraError extends Error {
 /** 권한 프롬프트·장치 응답 대기 상한 */
 const GUM_TIMEOUT_MS = 20_000;
 
-/** 전면 카메라를 열어 video에 연결. 반환된 스트림은 closeCamera로 반드시 닫는다. */
-export async function openCamera(video: HTMLVideoElement): Promise<MediaStream> {
+export type Facing = 'user' | 'environment';
+
+/**
+ * 카메라를 열어 video에 연결. 반환된 스트림은 closeCamera로 반드시 닫는다.
+ * facing: 'user'(전면, 거울처럼 보여줌) | 'environment'(후면, 화각이 넓어 더 가까이서도 전신이 들어옴)
+ */
+export async function openCamera(video: HTMLVideoElement, facing: Facing = 'user'): Promise<MediaStream> {
   if (!navigator.mediaDevices?.getUserMedia) throw new CameraError('unavailable', 'getUserMedia 미지원');
   let stream: MediaStream;
   let timedOut = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   const gum = navigator.mediaDevices.getUserMedia({
-    video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 1280 } },
+    video: { facingMode: facing, width: { ideal: 720 }, height: { ideal: 1280 } },
     audio: false,
   });
   // 타임아웃 뒤에 늦게 열린 스트림은 즉시 끈다(표시등이 켜진 채 남지 않도록)

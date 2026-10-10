@@ -36,6 +36,7 @@ export function cameraScreen(): string {
     <div class="cam-controls">
       <label><input type="checkbox" id="toggle-skeleton" /> ${UI_TEXT.skeletonOnly}</label>
       <label><input type="checkbox" id="toggle-voice" checked /> ${UI_TEXT.voice}</label>
+      <button id="toggle-camera" class="link" type="button">${UI_TEXT.switchToBack}</button>
     </div>
   </main>`;
 }
