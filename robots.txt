@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /*?capture=1
+Sitemap: https://ghengoy.github.io/bodyscan/sitemap.xml

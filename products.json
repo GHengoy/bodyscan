@@ -1,0 +1,37 @@
+[
+  { "image": "", "name": "브이넥 티셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOGrR77Aq", "bodyType": "inverted-longTorso", "category": "top" },
+  { "image": "", "name": "하이웨이스트 와이드 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOM2HrM6u", "bodyType": "inverted-longTorso", "category": "bottom" },
+  { "image": "", "name": "롱 가디건", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOM8u0oaP", "bodyType": "inverted-longTorso", "category": "outer" },
+
+  { "image": "", "name": "헨리넥 티셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIONhvAXue", "bodyType": "inverted-balanced", "category": "top" },
+  { "image": "", "name": "와이드 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIONpt8U6m", "bodyType": "inverted-balanced", "category": "bottom" },
+  { "image": "", "name": "싱글 블레이저", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIONvZuUV2", "bodyType": "inverted-balanced", "category": "outer" },
+
+  { "image": "", "name": "롱 기장 티셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIONBEgoF2", "bodyType": "inverted-longLegs", "category": "top" },
+  { "image": "", "name": "카고 와이드 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIONHrJKKG", "bodyType": "inverted-longLegs", "category": "bottom" },
+  { "image": "", "name": "오버사이즈 롱코트", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIONMnrJQa", "bodyType": "inverted-longLegs", "category": "outer" },
+
+  { "image": "", "name": "크롭 티셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIONTOCJtA", "bodyType": "balanced-longTorso", "category": "top" },
+  { "image": "", "name": "하이웨이스트 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hION0OF7Iq", "bodyType": "balanced-longTorso", "category": "bottom" },
+  { "image": "", "name": "크롭 블루종", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hION5qNMPs", "bodyType": "balanced-longTorso", "category": "outer" },
+
+  { "image": "", "name": "베이직 티셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hION9SFaTY", "bodyType": "balanced-balanced", "category": "top" },
+  { "image": "", "name": "스트레이트 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOOe4eGBw", "bodyType": "balanced-balanced", "category": "bottom" },
+  { "image": "", "name": "트렌치코트", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOOnkAEnY", "bodyType": "balanced-balanced", "category": "outer" },
+
+  { "image": "", "name": "롱 기장 셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOOuhSwmW", "bodyType": "balanced-longLegs", "category": "top" },
+  { "image": "", "name": "미드라이즈 스트레이트 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOOCFfhFA", "bodyType": "balanced-longLegs", "category": "bottom" },
+  { "image": "", "name": "롱 재킷", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOOLkilLE", "bodyType": "balanced-longLegs", "category": "outer" },
+
+  { "image": "", "name": "보트넥 티셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOOS5H2m4", "bodyType": "triangle-longTorso", "category": "top" },
+  { "image": "", "name": "부츠컷 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOOXYiq1Q", "bodyType": "triangle-longTorso", "category": "bottom" },
+  { "image": "", "name": "숄더 포인트 재킷", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOO17vJeu", "bodyType": "triangle-longTorso", "category": "outer" },
+
+  { "image": "", "name": "오프숄더 티셔츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOO9fKLS0", "bodyType": "triangle-balanced", "category": "top" },
+  { "image": "", "name": "A라인 스커트", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOPgdw66m", "bodyType": "triangle-balanced", "category": "bottom" },
+  { "image": "", "name": "숄더패드 블레이저", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOPkkXDNc", "bodyType": "triangle-balanced", "category": "outer" },
+
+  { "image": "", "name": "퍼프소매 블라우스", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOPrDZroa", "bodyType": "triangle-longLegs", "category": "top" },
+  { "image": "", "name": "블랙 와이드 팬츠", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOPytZqGO", "bodyType": "triangle-longLegs", "category": "bottom" },
+  { "image": "", "name": "롱 코트", "price": "쿠팡 최저가·리뷰 보기", "url": "https://link.coupang.com/a/hIOPC5ii5c", "bodyType": "triangle-longLegs", "category": "outer" }
+]
