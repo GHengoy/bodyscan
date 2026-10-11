@@ -4,8 +4,13 @@ import { fileURLToPath } from 'node:url';
 
 /** 배포 경로. GitHub Pages(프로젝트 사이트)처럼 하위 경로에 올릴 때 BASE_PATH=/bodyscan/ 로 빌드한다. */
 const BASE = process.env.BASE_PATH ?? '/';
-/** 공개 주소(절대 URL, 슬래시로 끝). OG 이미지·canonical·sitemap에 쓰인다. */
-const SITE_URL = process.env.SITE_URL ?? 'https://ghengoy.github.io/bodyscan/';
+/** 공개 주소(절대 URL, 슬래시로 끝). OG 이미지·canonical·sitemap에 쓰인다. 기본은 Vercel 주소(대표 주소). */
+const SITE_URL = process.env.SITE_URL ?? 'https://bodyscan-iota.vercel.app/';
+/** 검색엔진 소유확인 메타 태그 content 값(비어 있으면 태그를 넣지 않음) */
+const VERIFY_TAGS = [
+  ['google-site-verification', process.env.GOOGLE_SITE_VERIFICATION],
+  ['naver-site-verification', process.env.NAVER_SITE_VERIFICATION],
+] as const;
 
 function swPrecache(): Plugin {
   return {
@@ -32,7 +37,11 @@ function seoFiles(): Plugin {
   return {
     name: 'bodyscan-seo',
     transformIndexHtml(html) {
-      return html.replaceAll('__SITE_URL__', SITE_URL);
+      const verify = VERIFY_TAGS
+        .filter(([, v]) => v)
+        .map(([name, v]) => `<meta name="${name}" content="${v}" />`)
+        .join('\n    ');
+      return html.replaceAll('__SITE_URL__', SITE_URL).replace('<!-- __VERIFY_TAGS__ -->', verify);
     },
     generateBundle() {
       const today = new Date().toISOString().slice(0, 10);

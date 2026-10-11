@@ -55,7 +55,9 @@ npm run build      # dist/ 생성
 
 ## 배포
 
-**현재 배포 주소: https://ghengoy.github.io/bodyscan/** — `npm run deploy`가 `BASE_PATH=/bodyscan/`로 빌드한 `dist/`를 `gh-pages` 브랜치로 푸시하고, GitHub Pages가 그 브랜치를 서빙합니다(반영 1~2분). 광고 ID를 넣으려면 `.env`에 `VITE_ADSENSE_*`를 채운 뒤 `npm run deploy`를 다시 실행하세요. 하위 경로 배포라 코드의 모든 경로는 `import.meta.env.BASE_URL`을 기준으로 하며, 서비스 워커도 빌드 시 `BASE`가 주입됩니다. 루트(`/`)에 올리는 호스팅에서는 `BASE_PATH` 없이 빌드하면 됩니다.
+**대표 주소: https://bodyscan-iota.vercel.app/** — Vercel이 `GHengoy/bodyscan` 저장소에 연결되어 `master`에 푸시하면 자동 배포됩니다(환경 변수는 Vercel 프로젝트 Settings에 등록됨; 빌드·헤더 설정은 `vercel.json`). canonical/OG/sitemap은 이 주소를 가리키며(`SITE_URL` 기본값), 검색엔진 소유확인 태그는 빌드 환경 변수 `GOOGLE_SITE_VERIFICATION`/`NAVER_SITE_VERIFICATION`으로 주입됩니다.
+
+**보조 주소: https://ghengoy.github.io/bodyscan/** — `npm run deploy`가 `BASE_PATH=/bodyscan/`로 빌드한 `dist/`를 `gh-pages` 브랜치로 푸시하고, GitHub Pages가 그 브랜치를 서빙합니다(반영 1~2분). 광고 ID를 넣으려면 `.env`에 `VITE_ADSENSE_*`를 채운 뒤 `npm run deploy`를 다시 실행하세요. 하위 경로 배포라 코드의 모든 경로는 `import.meta.env.BASE_URL`을 기준으로 하며, 서비스 워커도 빌드 시 `BASE`가 주입됩니다. 루트(`/`)에 올리는 호스팅에서는 `BASE_PATH` 없이 빌드하면 됩니다.
 
 다른 호스팅: 정적 산출물(`dist/`)을 Vercel / Netlify / Cloudflare Pages에 올리면 끝. 빌드 명령 `npm run build`, 출력 `dist`. HTTPS는 자동. `vercel.json`과 `netlify.toml`에 빌드 설정과 보안·캐시 헤더(`Permissions-Policy: camera=(self)`, 모델/WASM/해시 자산 1년 캐시, `sw.js` no-cache)가 들어 있어 저장소를 연결하면 그대로 적용됩니다. 빌드마다 `sw.js`에 새 캐시 이름과 해시 자산 목록이 자동으로 들어가므로 배포 후 사용자는 다음 방문(온라인)에서 새 버전을 받습니다. 수동으로 캐시 이름을 올릴 필요 없습니다.
 

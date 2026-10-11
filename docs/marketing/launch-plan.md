@@ -1,12 +1,12 @@
 # BodyScan 사용자 유입 플랜
 
-사이트: https://ghengoy.github.io/bodyscan/ · 한 줄: **"30초 체형·자세 테스트 — 당신은 거북이? 운동선수?"**
+사이트: https://bodyscan-iota.vercel.app/ · 한 줄: **"30초 체형·자세 테스트 — 당신은 거북이? 운동선수?"**
 
 핵심 유입 엔진은 **결과 카드 공유**다. 결과가 "당신은 거북이시군요 🐢"처럼 공유하고 싶은 형태이고, 카드와 공유 문구에 사이트 링크가 붙어 있어 본 사람이 바로 들어온다(바이럴 루프). 모든 채널은 이 루프에 사람을 "첫 투입"하는 역할이다.
 
 ## 0. 이미 사이트에 들어간 것 (코드)
 - 공유 시트에 카드 PNG + 링크 + 문구("내 체형 테스트 결과: {캐릭터} — 너도 해봐!")
-- 카드 하단 워터마크 "👉 나도 30초 체형 테스트: ghengoy.github.io/bodyscan"
+- 카드 하단 워터마크 "👉 나도 30초 체형 테스트: bodyscan-iota.vercel.app"
 - 데스크톱/미지원 브라우저용 "링크 복사" 버튼
 - 카톡·인스타·X 미리보기(OG 이미지·제목·설명), 검색용 제목/설명/키워드, FAQ, sitemap/robots, JSON-LD
 - GA4 이벤트: `measure_complete`(캐릭터별), `share`(방법), `product_click`(카테고리) — `.env`에 `VITE_GA_ID` 넣고 `npm run deploy`
@@ -14,7 +14,7 @@
 ## 1. 오늘 할 일 (계정만 있으면 10분, 무료)
 | 할 일 | 방법 |
 |---|---|
-| 구글 서치 콘솔 등록 | https://search.google.com/search-console → URL 접두어 `https://ghengoy.github.io/bodyscan/` → HTML 태그 방식 인증(메타 태그를 알려주면 index.html에 넣어 재배포) → Sitemaps에 `sitemap.xml` 제출 |
+| 구글 서치 콘솔 등록 | https://search.google.com/search-console → URL 접두어 `https://bodyscan-iota.vercel.app/` → HTML 태그 방식 인증(메타 태그를 알려주면 index.html에 넣어 재배포) → Sitemaps에 `sitemap.xml` 제출 |
 | 네이버 서치어드바이저 | https://searchadvisor.naver.com → 사이트 등록 → 동일 방식 인증 → 사이트맵 제출 |
 | GA4 만들기 | https://analytics.google.com → 속성 생성 → 측정 ID `G-…` → `.env`의 `VITE_GA_ID` |
 | 카카오톡 미리보기 확인 | 나에게 링크 보내기 → OG 이미지·제목 뜨는지. 안 뜨면 https://developers.kakao.com/tool/debugger/sharing 에서 캐시 초기화 |
@@ -29,7 +29,7 @@
 **글 템플릿 (복붙용)**
 > 폰 카메라로 30초 자세 테스트 해주는 사이트인데 나 거북목 18도 나와서 "당신은 거북이시군요🐢" 뜸 ㅋㅋㅋ
 > 영상 저장 안 되고 폰에서만 돌아간다길래 해봄. 옷 추천까지 해줌
-> https://ghengoy.github.io/bodyscan/ (폰으로 열어야 됨)
+> https://bodyscan-iota.vercel.app/ (폰으로 열어야 됨)
 > [결과 카드 스크린샷]
 
 ## 3. 숏폼 (인스타 릴스 · 틱톡 · 유튜브 쇼츠)
