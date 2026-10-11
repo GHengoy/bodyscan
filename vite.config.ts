@@ -9,7 +9,8 @@ const SITE_URL = process.env.SITE_URL ?? 'https://bodyscan-iota.vercel.app/';
 /** 검색엔진 소유확인 메타 태그 content 값(비어 있으면 태그를 넣지 않음) */
 const VERIFY_TAGS = [
   ['google-site-verification', process.env.GOOGLE_SITE_VERIFICATION],
-  ['naver-site-verification', process.env.NAVER_SITE_VERIFICATION],
+  // 네이버 서치어드바이저 소유확인(공개 토큰, 비밀 아님). 호스트 bodyscan-iota.vercel.app 기준
+  ['naver-site-verification', process.env.NAVER_SITE_VERIFICATION ?? 'ca88e30121fcf1da56ed003d37d3d23812c672b7'],
 ] as const;
 
 function swPrecache(): Plugin {
