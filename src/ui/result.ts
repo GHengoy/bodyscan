@@ -9,7 +9,8 @@ import { mountBanner, AD_SLOTS } from '../ads/banner';
 import { drawSkeleton } from './overlay';
 import { renderShareCard, shareResult, canShareFiles } from './shareCard';
 import {
-  UI_TEXT, RESULT_TEXT, POSTURE_COPY, SHAPE_COPY, headlineCopy, postureMessage, fillTemplate, type StyleAdvice,
+  UI_TEXT, RESULT_TEXT, POSTURE_COPY, SHAPE_COPY, STRETCH_COPY, headlineCopy, postureMessage, fillTemplate, stretchesFor,
+  type StyleAdvice, type Stretch,
 } from '../copy';
 import { siteUrl } from '../site';
 
@@ -40,6 +41,35 @@ function itemCard(item: GradedItem): string {
     <div class="msg">${postureMessage(item)}</div>
     ${item.grade === 'good' ? '' : `<div class="tip">💡 ${c.tip}</div>`}
   </div>`;
+}
+
+function stretchHtml(s: Stretch): string {
+  return `
+  <div class="stretch">
+    <div class="name">${s.emoji} ${s.name} <span class="dose">${s.dose}</span></div>
+    <ol>${s.steps.map((t) => `<li>${t}</li>`).join('')}</ol>
+  </div>`;
+}
+
+/** 주의 항목(불균형 먼저, 심한 순)마다 펼침 카드. 모두 양호면 유지 루틴 */
+function stretchSection(items: GradedItem[]): string {
+  const rank = { bad: 0, warn: 1, good: 2 };
+  const targets = items
+    .filter((i) => i.grade !== 'good' && stretchesFor(i).length > 0)
+    .sort((a, b) => rank[a.grade] - rank[b.grade] || b.severity - a.severity);
+  const body = targets.length === 0
+    ? `<p class="sub">${RESULT_TEXT.stretchIntroPerfect}</p>${STRETCH_COPY.perfect.map(stretchHtml).join('')}`
+    : `<p class="sub">${RESULT_TEXT.stretchIntro}</p>${targets.map((i, n) => `
+      <details${n === 0 ? ' open' : ''}>
+        <summary>${POSTURE_COPY[i.id].title} <span class="badge ${i.grade}">${RESULT_TEXT.gradeLabel[i.grade]}</span></summary>
+        ${stretchesFor(i).map(stretchHtml).join('')}
+      </details>`).join('')}`;
+  return `
+  <section class="card stretches">
+    <h2>${RESULT_TEXT.stretchTitle}</h2>
+    ${body}
+    <p class="fineprint">${RESULT_TEXT.stretchSafety}</p>
+  </section>`;
 }
 
 function productHtml(p: Product | null, cat: ProductCategory): string {
@@ -81,6 +111,7 @@ export function renderResult(
     </section>
     <p class="summary">${attention === 0 ? RESULT_TEXT.allGood : RESULT_TEXT.attention(attention)}</p>
     <section class="items">${data.items.map(itemCard).join('')}</section>
+    ${stretchSection(data.items)}
     <div class="ad-slot" data-slot="result1"></div>
     <section class="card">
       <h2>${RESULT_TEXT.proportionTitle}</h2>

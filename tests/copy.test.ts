@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { POSTURE_COPY, HEADLINES, headlineCopy, fillTemplate } from '../src/copy';
+import { POSTURE_COPY, HEADLINES, STRETCH_COPY, headlineCopy, fillTemplate, stretchesFor } from '../src/copy';
 import type { PostureItemId } from '../src/analysis/grade';
 
 const IDS: PostureItemId[] = [
@@ -31,5 +31,28 @@ describe('copy completeness', () => {
   });
   it('fillTemplate replaces placeholders', () => {
     expect(fillTemplate('{deg}° 기울어진 {side}', { deg: 4.2, side: '왼쪽' })).toBe('4.2° 기울어진 왼쪽');
+  });
+});
+
+describe('stretches', () => {
+  it('every posture item has at least one stretch with steps and dose', () => {
+    for (const id of IDS) {
+      const list = stretchesFor({ id, variant: '' });
+      expect(list.length).toBeGreaterThan(0);
+      for (const s of list) {
+        expect(s.steps.length).toBeGreaterThan(0);
+        expect(s.dose.length).toBeGreaterThan(0);
+      }
+    }
+  });
+  it('picks direction-specific stretches when they exist', () => {
+    expect(stretchesFor({ id: 'kneeAlign', variant: 'o' })).toBe(STRETCH_COPY['kneeAlign.o']);
+    expect(stretchesFor({ id: 'kneeAlign', variant: 'x' })).toBe(STRETCH_COPY['kneeAlign.x']);
+    expect(stretchesFor({ id: 'pelvicTilt', variant: 'anterior' })).toBe(STRETCH_COPY['pelvicTilt.anterior']);
+    expect(stretchesFor({ id: 'trunkLean', variant: 'backward' })).toBe(STRETCH_COPY['trunkLean.backward']);
+    expect(stretchesFor({ id: 'shoulderTilt', variant: 'left' })).toBe(STRETCH_COPY.shoulderTilt);
+  });
+  it('has a maintenance routine for perfect results', () => {
+    expect(STRETCH_COPY.perfect.length).toBeGreaterThan(0);
   });
 });
