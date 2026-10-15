@@ -9,7 +9,7 @@
 - 카드 하단 워터마크 "👉 나도 30초 체형 테스트: bodyscan-iota.vercel.app"
 - 데스크톱/미지원 브라우저용 "링크 복사" 버튼
 - 카톡·인스타·X 미리보기(OG 이미지·제목·설명), 검색용 제목/설명/키워드, FAQ, sitemap/robots, JSON-LD
-- GA4 이벤트: `measure_complete`(캐릭터별), `share`(방법), `product_click`(카테고리) — `.env`에 `VITE_GA_ID` 넣고 `npm run deploy`
+- GA4 이벤트: `measure_start`, `measure_complete`(캐릭터별), `share`(방법), `product_click`(카테고리) — `.env`에 `VITE_GA_ID` 넣고 `npm run deploy`
 
 ## 1. 오늘 할 일 (계정만 있으면 10분, 무료)
 | 할 일 | 방법 |
@@ -46,6 +46,8 @@
 - 패션 쇼핑몰/쿠팡 파트너스 활동하는 블로거: 체형별 옷 추천 결과 화면이 그들의 콘텐츠 소재
 
 ## 5. 유료 광고 (계정·예산 생기면)
+> 상세 계획(손익 계산·소재·UTM·7일 테스트 규칙): [paid-ads-plan.md](paid-ads-plan.md)
+
 테스트 예산 **일 1~2만원 × 7일**로 채널별 CPC/유입당 측정 완료율(GA `measure_complete`)을 비교한 뒤 되는 채널에 몰아준다.
 
 | 채널 | 타겟 | 소재 |

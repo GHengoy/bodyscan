@@ -25,7 +25,7 @@ export function enableAnalytics(): void {
   document.head.appendChild(s);
 }
 
-/** 이벤트: measure_complete(headline), share(method), product_click(category) */
+/** 이벤트: measure_start, measure_complete(headline), share(method), product_click(category) */
 export function track(event: string, params: Record<string, string | number> = {}): void {
   if (!loaded || !window.gtag) return;
   window.gtag('event', event, params);

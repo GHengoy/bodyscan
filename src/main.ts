@@ -72,6 +72,7 @@ function showStart(): void {
   mountBanner($('[data-slot="start"]'), AD_SLOTS.start);
   $('#start-btn').onclick = (e) => {
     (e.currentTarget as HTMLButtonElement).disabled = true;
+    track('measure_start'); // 광고 유입 → 시작 → 완료 퍼널의 두 번째 단계
     location.assign(captureUrl());
   };
   preloadProducts(); // HTTP 캐시를 데워 둔다(측정 문서에서 다시 읽음)
