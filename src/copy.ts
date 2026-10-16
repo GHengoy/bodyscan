@@ -183,6 +183,7 @@ export const UI_TEXT = {
   switchToFront: '🔄 전면 카메라로',
   backCameraTip: '후면 카메라는 화각이 넓어 더 가까이서도 전신이 들어와요. 누가 찍어주거나 음성 안내를 들으며 측정하세요.',
   adPlaceholder: '광고 자리',
+  guideLink: '📖 거북목·라운드숄더·골반 자가진단 가이드 보기',
 } as const;
 
 export const RESULT_TEXT = {

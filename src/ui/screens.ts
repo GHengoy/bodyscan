@@ -18,6 +18,7 @@ export function startScreen(): string {
     <section class="faq">
       ${UI_TEXT.faq.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}
     </section>
+    <a class="guide-link" href="${import.meta.env.BASE_URL}guide/">${UI_TEXT.guideLink}</a>
   </main>`;
 }
 

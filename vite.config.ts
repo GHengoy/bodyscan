@@ -1,6 +1,8 @@
 import { defineConfig, type Plugin } from 'vitest/config';
+import { loadEnv } from 'vite';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { guideFiles, guideSitemapPaths } from './src/guides/render';
 
 /** 배포 경로. GitHub Pages(프로젝트 사이트)처럼 하위 경로에 올릴 때 BASE_PATH=/bodyscan/ 로 빌드한다. */
 const BASE = process.env.BASE_PATH ?? '/';
@@ -49,7 +51,9 @@ function seoFiles(): Plugin {
       this.emitFile({
         type: 'asset',
         fileName: 'sitemap.xml',
-        source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SITE_URL}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n`,
+        source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SITE_URL}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n${guideSitemapPaths()
+          .map((p) => `  <url><loc>${SITE_URL}${p}</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>\n`)
+          .join('')}</urlset>\n`,
       });
       this.emitFile({
         type: 'asset',
@@ -60,10 +64,27 @@ function seoFiles(): Plugin {
   };
 }
 
-export default defineConfig({
+/** 검색 유입용 정적 가이드 페이지(/guide/…). 카메라가 없는 문서라 GA·애드센스를 넣는다. */
+function guidePages(env: Record<string, string>): Plugin {
+  return {
+    name: 'bodyscan-guides',
+    apply: 'build',
+    generateBundle() {
+      const files = guideFiles({
+        siteUrl: SITE_URL,
+        base: BASE,
+        adsenseClient: env.VITE_ADSENSE_CLIENT || undefined,
+        gaId: env.VITE_GA_ID || undefined,
+      });
+      for (const [fileName, source] of files) this.emitFile({ type: 'asset', fileName, source });
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => ({
   base: BASE,
-  plugins: [swPrecache(), seoFiles()],
+  plugins: [swPrecache(), seoFiles(), guidePages(loadEnv(mode, process.cwd(), 'VITE_'))],
   server: { port: 5173 },
   build: { target: 'es2022' },
   test: { environment: 'node', include: ['tests/**/*.test.ts'] },
-});
+}));
