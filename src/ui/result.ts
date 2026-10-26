@@ -9,7 +9,7 @@ import { mountBanner, AD_SLOTS } from '../ads/banner';
 import { drawSkeleton } from './overlay';
 import { renderShareCard, shareResult, canShareFiles } from './shareCard';
 import {
-  UI_TEXT, RESULT_TEXT, POSTURE_COPY, SHAPE_COPY, STRETCH_COPY, headlineCopy, postureMessage, fillTemplate, stretchesFor,
+  UI_TEXT, RESULT_TEXT, POSTURE_COPY, SHAPE_COPY, STRETCH_COPY, STRETCH_GEAR, headlineCopy, postureMessage, fillTemplate, stretchesFor,
   type StyleAdvice, type Stretch,
 } from '../copy';
 import { siteUrl } from '../site';
@@ -68,6 +68,13 @@ function stretchSection(items: GradedItem[]): string {
   <section class="card stretches">
     <h2>${RESULT_TEXT.stretchTitle}</h2>
     ${body}
+    <h3 class="gear-title">${RESULT_TEXT.stretchGearTitle}</h3>
+    ${STRETCH_GEAR.map((g) => `
+    <a class="product" href="${esc(g.url)}" target="_blank" rel="noopener sponsored" data-category="gear">
+      <div class="thumb">${g.emoji}</div>
+      <div><div class="name">${g.name}</div><div class="price">${g.desc}</div><div class="cta">${RESULT_TEXT.stretchGearCta}</div></div>
+    </a>`).join('')}
+    <p class="fineprint">${RESULT_TEXT.affiliateDisclosure}</p>
     <p class="fineprint">${RESULT_TEXT.stretchSafety}</p>
   </section>`;
 }

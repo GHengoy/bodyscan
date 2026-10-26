@@ -216,8 +216,16 @@ export const RESULT_TEXT = {
   stretchTitle: '맞춤 스트레칭 🧘',
   stretchIntro: '주의 항목에 맞춘 동작이에요. 눌러서 방법을 펼쳐 보세요.',
   stretchIntroPerfect: '지금 자세를 지키는 하루 3분 유지 루틴이에요.',
+  stretchGearTitle: '있으면 편한 용품',
+  stretchGearCta: '쿠팡에서 보기 →',
   stretchSafety: '반동 없이 천천히, 통증이 느껴지면 바로 멈추세요. 통증이 계속되면 전문가와 상담하세요.',
 } as const;
+
+/** 스트레칭 카드 하단 추천 용품(쿠팡 파트너스 단축 링크) */
+export const STRETCH_GEAR = [
+  { emoji: '🧻', name: '폼롤러', desc: '등·허리 풀어주기', url: 'https://link.coupang.com/a/iaW3gqrNyC' },
+  { emoji: '🎗️', name: '스트레칭 밴드', desc: '어깨·가슴 스트레칭 보조', url: 'https://link.coupang.com/a/iaW7a3PZAa' },
+] as const;
 
 export interface StyleAdvice {
   top: string;
